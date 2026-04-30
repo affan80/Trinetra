@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OSINT Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .meta {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        a {
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🛰️ OSINT Reddit Feed</h1>
+
+<div id="feed"></div>
+
+<script>
+async function loadData() {
+    try {
+        const response = await fetch("reddit_osint.jsonl");
+        const text = await response.text();
+
+        const lines = text.trim().split("\n");
+
+        // 🔥 Convert lines → JSON objects
+        const dataList = lines.map(line => JSON.parse(line));
+
+        // 🔥 Sort latest first (IMPORTANT)
+        dataList.sort((a, b) => b.timestamp - a.timestamp);
+
+        const feed = document.getElementById("feed");
+        feed.innerHTML = "";
+
+        dataList.forEach(data => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            card.innerHTML = `
+                <div class="title">${data.text}</div>
+                <div class="meta">
+                    Subreddit: r/${data.subreddit} |
+                    ${new Date(data.timestamp * 1000).toLocaleString()}
+                </div>
+                <a href="${data.url}" target="_blank">View Source</a>
+            `;
+
+            feed.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error loading data:", error);
+    }
+}
+
+// 🔥 Initial load
+loadData();
+
+// 🔁 Auto refresh every 5 seconds (feels real-time)
+setInterval(loadData, 5000);
+</script>
+
+</body>
+</html>
