@@ -78,7 +78,7 @@ class NewsSpider(scrapy.Spider):
 
     def parse_article(self, response):
         scraper = NewsScraper(response)
-        article_data = scraper.get_article_data()
+        article_data = scraper.get_data()
 
         item = NewsItem()
 
@@ -170,3 +170,6 @@ class NewsSpider(scrapy.Spider):
 
     def get_domain(self, url):
         return urlparse(url).netloc.replace("www.", "")
+      if netloc.startswith("www."):
+            return netloc[4:]
+        return netloc

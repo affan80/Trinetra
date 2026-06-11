@@ -18,19 +18,19 @@ class BlogScraper:
     }
 
     TEXT_SELECTORS = [
-        "article .entry-content ::text",
-        "article .post-content ::text",
-        "article .blog-content ::text",
-        "article .content ::text",
-        ".entry-content ::text",
-        ".post-content ::text",
-        ".blog-post-content ::text",
-        ".blog-content ::text",
-        ".single-post-content ::text",
-        ".article-content ::text",
-        ".content-area article ::text",
-        "article ::text",
-        "main ::text",
+        "article .entry-content *::text",
+        "article .post-content *::text",
+        "article .blog-content *::text",
+        "article .content *::text",
+        ".entry-content *::text",
+        ".post-content *::text",
+        ".blog-post-content *::text",
+        ".blog-content *::text",
+        ".single-post-content *::text",
+        ".article-content *::text",
+        ".content-area article *::text",
+        "article *::text",
+        "main *::text",
     ]
 
     def __init__(self, response):
@@ -41,7 +41,7 @@ class BlogScraper:
         for selector in selectors:
             value = self.response.css(selector).get()
             if value:
-                return clean_text(value)
+                return value
         return ""
 
     def unique_add(self, items, seen, value):
@@ -82,7 +82,7 @@ class BlogScraper:
                 if self.is_valid_content_text(part)
             ]
 
-            if len(parts) >= 3:
+            if len(parts) >= 1:
                 return clean_text(" ".join(parts))
 
         return ""
@@ -372,3 +372,5 @@ class BlogScraper:
 
     def get_article_data(self):
         return self.get_blog_data()
+t_blog_data(self):
+        return self.get_data()

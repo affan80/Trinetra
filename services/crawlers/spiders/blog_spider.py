@@ -69,7 +69,7 @@ class BlogSpider(scrapy.Spider):
 
     def parse_blog(self, response):
         scraper = BlogScraper(response)
-        data = scraper.get_blog_data()
+        data = scraper.get_data()
 
         if not data.get("title") and not data.get("text"):
             return
@@ -160,3 +160,6 @@ class BlogSpider(scrapy.Spider):
 
     def get_domain(self, url):
         return urlparse(url).netloc.replace("www.", "")
+   if netloc.startswith("www."):
+            return netloc[4:]
+        return netloc

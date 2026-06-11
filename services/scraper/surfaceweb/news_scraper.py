@@ -266,7 +266,7 @@ class NewsScraper:
         return None
 
     # 13. Return all extracted data together
-    def get_article_data(self):
+    def get_data(self):
         return {
             "title": self.get_title(),
             "text": self.get_text(),
@@ -280,3 +280,6 @@ class NewsScraper:
             "domain": self.get_domain(),
             "json_ld": self.get_json_ld(),
         }
+
+    def get_article_data(self):
+        return self.get_data()
