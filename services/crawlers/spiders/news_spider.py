@@ -170,6 +170,3 @@ class NewsSpider(scrapy.Spider):
 
     def get_domain(self, url):
         return urlparse(url).netloc.replace("www.", "")
-      if netloc.startswith("www."):
-            return netloc[4:]
-        return netloc

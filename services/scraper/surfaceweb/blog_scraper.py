@@ -303,7 +303,7 @@ class BlogScraper:
         return images[0] if images else ""
 
     def get_domain(self):
-        return urlparse(self.response.url).netloc
+        return urlparse(self.response.url).netloc.replace("www.", "")
 
     def _load_json_ld(self):
         data = []
@@ -370,7 +370,8 @@ class BlogScraper:
             "json_ld": self.get_json_ld(),
         }
 
+    def get_data(self):
+        return self.get_blog_data()
+
     def get_article_data(self):
         return self.get_blog_data()
-t_blog_data(self):
-        return self.get_data()

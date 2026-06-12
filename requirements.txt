@@ -6,3 +6,4 @@ lxml==6.1.1
 itemadapter==0.13.1
 parsel==1.11.0
 w3lib==2.4.1
+telethon==1.36.0
