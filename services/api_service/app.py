@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from services.shared.redis_client import ping_redis, get_redis_client
 from services.shared.redis_metrics import RedisMetrics
 from services.shared.redis_queue import RedisQueue
+from services.shared.url_frontier import UrlFrontier
 
 app = FastAPI(title="Trinetra OSINT API")
 metrics = RedisMetrics()
@@ -23,9 +24,24 @@ async def health_check():
 
 @app.get("/stats")
 async def get_stats():
+    frontier = UrlFrontier(metrics=metrics)
     return {
         "metrics": metrics.get_all_metrics(),
-        "queue_length": raw_items_queue.length()
+        "queue_length": raw_items_queue.length(),
+        "frontier": frontier.stats(),
+    }
+
+@app.get("/frontier/stats")
+async def get_frontier_stats():
+    frontier = UrlFrontier(metrics=metrics)
+    return frontier.stats()
+
+@app.get("/frontier/dead-letters")
+async def get_frontier_dead_letters(limit: int = 20):
+    frontier = UrlFrontier(metrics=metrics)
+    return {
+        "dead_letter_length": frontier.dead_letter_length(),
+        "items": frontier.get_dead_letters(limit=limit),
     }
 
 @app.post("/items/test")

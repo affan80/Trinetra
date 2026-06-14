@@ -3,19 +3,26 @@
 # ==============================================================================
 # TRINETRA SCRAPER TEST SUITE
 # ==============================================================================
-# This script runs all spiders and saves unique output files in test_output/.
+# This script runs offline scraper checks, then all active spiders, and saves unique output files in artifacts/test_output/.
 # 
 # To add a new spider:
 # Add a line to the SPIDERS array in the format: "spider_file_path|arguments"
 # ==============================================================================
 
 # Configuration
-OUTPUT_DIR="test_output"
-VENV_PYTHON="./.venv/bin/python3"
+OUTPUT_DIR="artifacts/test_output"
+VENV_PYTHON="./.venv/bin/python"
 SCRAPY="./.venv/bin/scrapy"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 export PYTHONPATH="."
-export REDIS_URL="redis://localhost:6380/0"
+export REDIS_URL="${REDIS_URL:-redis://localhost:6379/0}"
+export SCRAPLING_PARSER_ENABLED="${SCRAPLING_PARSER_ENABLED:-true}"
+export SCRAPLING_FETCH_FALLBACK_ENABLED="${SCRAPLING_FETCH_FALLBACK_ENABLED:-false}"
+export SCRAPLING_FETCH_MODE="${SCRAPLING_FETCH_MODE:-static}"
+export SCRAPLING_BROWSER_ENABLED="${SCRAPLING_BROWSER_ENABLED:-false}"
+export SCRAPLING_ADAPTIVE_ENABLED="${SCRAPLING_ADAPTIVE_ENABLED:-false}"
+export SCRAPLING_TIMEOUT_MS="${SCRAPLING_TIMEOUT_MS:-30000}"
+export SCRAPLING_PROXY_URL="${SCRAPLING_PROXY_URL:-}"
 
 # Ensure output directory exists
 if [ ! -d "$OUTPUT_DIR" ]; then
@@ -33,6 +40,13 @@ SPIDERS=(
 
 echo "🚀 Starting Trinetra Scraper Tests..."
 echo "🕒 Timestamp: $TIMESTAMP"
+
+echo ""
+echo "----------------------------------------------------------------------"
+echo "🧪 RUNNING: offline scraper checks"
+echo "----------------------------------------------------------------------"
+"$VENV_PYTHON" tests/smoke/test_imports.py
+"$VENV_PYTHON" tests/scraper/test_scrapers.py
 
 for ENTRY in "${SPIDERS[@]}"; do
     # Split the entry into path and args
@@ -55,7 +69,7 @@ for ENTRY in "${SPIDERS[@]}"; do
     
     # Run the spider with a limit of 10 pages for testing purposes
     $SCRAPY runspider "$SPIDER_PATH" \
-        -a $ARGS \
+        -a "$ARGS" \
         -a max_pages=10 \
         -o "$OUT_FILE" \
         --loglevel INFO

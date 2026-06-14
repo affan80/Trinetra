@@ -8,7 +8,8 @@ from services.common.text_cleaner import clean_text
 
 
 class TelegramScraper:
-    def __init__(self, api_id, api_hash, session_name="telegram_session"):
+    def __init__(self, api_id, api_hash, session_name="telegram_session", max_flood_wait=60):
+        self.max_flood_wait = max_flood_wait
         self.client = TelegramClient(
             session_name,
             int(api_id),
@@ -37,7 +38,9 @@ class TelegramScraper:
                     yield data
 
         except FloodWaitError as error:
-            time.sleep(error.seconds)
+            if error.seconds <= self.max_flood_wait:
+                time.sleep(error.seconds)
+            return
 
         except (ChannelPrivateError, UsernameInvalidError, ValueError):
             return

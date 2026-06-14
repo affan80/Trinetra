@@ -1,5 +1,6 @@
 # Scraper and Crawler Dependencies
 scrapy==2.16.0
+scrapling[fetchers]==0.4.9
 python-dateutil==2.9.0.post0
 requests==2.32.5
 lxml==6.1.1
