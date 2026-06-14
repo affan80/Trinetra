@@ -15,6 +15,7 @@ VENV_PYTHON="./.venv/bin/python3"
 SCRAPY="./.venv/bin/scrapy"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 export PYTHONPATH="."
+export REDIS_URL="redis://localhost:6380/0"
 
 # Ensure output directory exists
 if [ ! -d "$OUTPUT_DIR" ]; then

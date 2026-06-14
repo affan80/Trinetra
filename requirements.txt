@@ -9,3 +9,8 @@ w3lib==2.4.1
 telethon==1.36.0
 Pillow==10.4.0
 python-dotenv==1.0.1
+
+# Redis and API Dependencies
+redis==5.0.1
+fastapi==0.109.2
+uvicorn==0.27.1

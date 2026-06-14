@@ -14,11 +14,11 @@ try:
     from services.scraper.surfaceweb.telegram_scraper import TelegramScraper
     from services.scraper.surfaceweb.image_scraper import ImageScraper
     
-    print("✅ All imports successful!")
+    print(" All imports successful!")
     
     # Test instantiation (dummy response for scrapers would be needed for full test)
-    print("✅ Classes identified correctly.")
+    print(" Classes identified correctly.")
 
 except Exception as e:
-    print(f"❌ Import failed: {e}")
+    print(f" Import failed: {e}")
     sys.exit(1)

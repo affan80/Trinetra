@@ -1,3 +1,3 @@
 ITEM_PIPELINES = {
-    "services.parser.pipelines.NewsPipeline": 300,
+    "services.parser.pipelines.OsintPipeline": 300,
 }

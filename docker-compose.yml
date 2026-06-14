@@ -1,0 +1,74 @@
+services:
+  redis:
+    image: redis:8-alpine
+    container_name: osint_redis
+    ports:
+      - "6380:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: osint_api
+    command: uvicorn services.api_service.app:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /app
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  worker:
+    build: .
+    container_name: osint_alert_worker
+    command: python -m services.worker_service.alert_worker
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /app
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  crawler:
+    build: .
+    container_name: osint_crawler
+    command: scrapy crawl news
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /app
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    profiles:
+      - crawlers
+
+volumes:
+  redis_data:
