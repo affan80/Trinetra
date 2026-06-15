@@ -1,8 +1,7 @@
 import sys
 import os
 
-# Set PYTHONPATH
-sys.path.append(os.getcwd())
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 try:
     from services.crawlers.spiders.blog_spider import BlogSpider
@@ -13,6 +12,11 @@ try:
     from services.scraper.surfaceweb.news_scraper import NewsScraper
     from services.scraper.surfaceweb.telegram_scraper import TelegramScraper
     from services.scraper.surfaceweb.image_scraper import ImageScraper
+    from services.scraper.discovery import UrlCandidate
+    from services.scraper.discovery.connectors import RssConnector, SitemapConnector
+    from services.scraper.policy import SourceRegistry, SourceRegistryEntry
+    from services.shared.url_frontier import UrlFrontier
+    from services.crawlers.spiders.frontier_spider import FrontierSpider
     
     print(" All imports successful!")
     

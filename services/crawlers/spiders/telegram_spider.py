@@ -24,9 +24,12 @@ class TelegramSpider(scrapy.Spider):
         self.session_name = os.getenv("TELEGRAM_SESSION", "telegram_session")
 
         env_channels = os.getenv("TELEGRAM_CHANNELS", "")
+        env_allowed_channels = os.getenv("TELEGRAM_ALLOWED_CHANNELS", env_channels)
+        self.allowed_channels = self.parse_channels(env_allowed_channels)
         self.channels = self.parse_channels(channels or env_channels)
 
-        self.limit = int(limit or os.getenv("TELEGRAM_LIMIT", 50))
+        self.max_limit = int(os.getenv("TELEGRAM_MAX_LIMIT", 200))
+        self.limit = min(int(limit or os.getenv("TELEGRAM_LIMIT", 50)), self.max_limit)
         self.days_back = int(days_back or os.getenv("TELEGRAM_DAYS_BACK", 7))
 
         if not self.api_id or not self.api_hash:
@@ -34,6 +37,11 @@ class TelegramSpider(scrapy.Spider):
 
         if not self.channels:
             raise ValueError("No Telegram channels provided")
+
+        if self.allowed_channels:
+            denied_channels = [channel for channel in self.channels if channel not in self.allowed_channels]
+            if denied_channels:
+                raise ValueError(f"Telegram channels are not allowlisted: {', '.join(denied_channels)}")
 
     def start_requests(self):
         yield scrapy.Request(
@@ -82,6 +90,11 @@ class TelegramSpider(scrapy.Spider):
             "replies": data.get("replies", 0),
             "reactions": data.get("reactions", {}),
             "media_type": data.get("media_type", ""),
+            "source_policy": {
+                "allowed_channels": self.allowed_channels,
+                "limit": self.limit,
+                "days_back": self.days_back,
+            },
         }
 
         return item
@@ -90,8 +103,18 @@ class TelegramSpider(scrapy.Spider):
         if not channels:
             return []
 
-        return [
+        parsed = [
             channel.strip().replace("@", "").replace("https://t.me/", "")
             for channel in channels.split(",")
             if channel.strip()
         ]
+
+        result = []
+        seen = set()
+        for channel in parsed:
+            key = channel.lower()
+            if key not in seen:
+                seen.add(key)
+                result.append(channel)
+
+        return result

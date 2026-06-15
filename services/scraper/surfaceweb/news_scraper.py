@@ -4,11 +4,13 @@ import re
 # Updated imports to use local package structure
 from services.common.text_cleaner import clean_text
 from services.common.date_time import parse_date
+from services.scraper.extractors.article_extractor import ArticleExtractor
 
 
 class NewsScraper:
     def __init__(self, response):
         self.response = response
+        self.extractor = ArticleExtractor(response.text, response.url)
 
     # 1. Extract title
     def get_title(self):
@@ -267,7 +269,7 @@ class NewsScraper:
 
     # 13. Return all extracted data together
     def get_data(self):
-        return {
+        data = {
             "title": self.get_title(),
             "text": self.get_text(),
             "author": self.get_author(),
@@ -280,6 +282,16 @@ class NewsScraper:
             "domain": self.get_domain(),
             "json_ld": self.get_json_ld(),
         }
+
+        if self.extractor.available:
+            scrapling_data = self.extractor.extract()
+            if scrapling_data:
+                for key, value in scrapling_data.items():
+                    if value not in ("", None, [], {}):
+                        data[key] = value
+                data.setdefault("provenance", self.extractor.provenance())
+
+        return data
 
     def get_article_data(self):
         return self.get_data()

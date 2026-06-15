@@ -1,0 +1,79 @@
+{
+  "sources": [
+    {
+      "source_name": "Books To Scrape Test",
+      "source_type": "blog",
+      "base_url": "https://books.toscrape.com/",
+      "priority": 20,
+      "topic_tags": ["test"],
+      "robots_obey": true,
+      "max_depth": 2,
+      "max_pages": 25,
+      "download_delay": 0.5,
+      "scrapling_fallback_allowed": false
+    },
+    {
+      "source_name": "Al Jazeera",
+      "source_type": "news",
+      "base_url": "https://www.aljazeera.com/",
+      "rss_urls": ["https://www.aljazeera.com/xml/rss/all.xml"],
+      "sitemap_urls": ["https://www.aljazeera.com/sitemap.xml"],
+      "discovery_queries": ["india border security", "south asia defence"],
+      "priority": 70,
+      "country_tags": ["IN"],
+      "topic_tags": ["news", "security"],
+      "robots_obey": true,
+      "max_depth": 2,
+      "max_pages": 100,
+      "download_delay": 1.0,
+      "scrapling_fallback_allowed": false
+    },
+    {
+      "source_name": "CSIS",
+      "source_type": "think_tank",
+      "base_url": "https://www.csis.org/",
+      "rss_urls": ["https://www.csis.org/rss.xml"],
+      "sitemap_urls": ["https://www.csis.org/sitemap.xml"],
+      "discovery_queries": ["india defence analysis", "indo pacific security"],
+      "priority": 75,
+      "country_tags": ["IN"],
+      "topic_tags": ["think_tank", "defence"],
+      "robots_obey": true,
+      "max_depth": 2,
+      "max_pages": 75,
+      "download_delay": 1.0,
+      "scrapling_fallback_allowed": false
+    },
+    {
+      "source_name": "Reddit Public Monitoring",
+      "source_type": "social",
+      "platform_id": "reddit",
+      "reddit_subreddits": ["worldnews", "technology"],
+      "discovery_queries": ["india border security", "cyber attack india"],
+      "priority": 45,
+      "country_tags": ["IN"],
+      "topic_tags": ["social", "monitoring"],
+      "max_pages": 2
+    },
+    {
+      "source_name": "YouTube Public Search",
+      "source_type": "video",
+      "platform_id": "youtube",
+      "youtube_queries": ["india border security", "defence news india"],
+      "priority": 55,
+      "country_tags": ["IN"],
+      "topic_tags": ["video", "monitoring"],
+      "max_pages": 1
+    },
+    {
+      "source_name": "Telegram Approved Channels",
+      "source_type": "social",
+      "platform_id": "telegram",
+      "telegram_channels": [],
+      "priority": 50,
+      "country_tags": ["IN"],
+      "topic_tags": ["telegram"],
+      "max_pages": 1
+    }
+  ]
+}

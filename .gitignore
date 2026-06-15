@@ -6,6 +6,45 @@
 ehthumbs.db
 Thumbs.db
 
+# Local temporary and scratch files
+tmp/
+temp/
+.tmp/
+**/tmp/
+**/temp/
+**/.tmp/
+**/.temp/
+**/scratch/
+**/scrap/
+**/scraps/
+**/scraping/temp/
+**/scraping/tmp/
+**/scrapping/temp/
+**/scrapping/tmp/
+docs/tmp/
+docs/temp/
+docs/**/tmp/
+docs/**/temp/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+scra.*
+scrap.*
+scratch.*
+scratch_*
+temp_*
+tmp_*
+
 __pycache__/
 *.py[cod]
 *$py.class
@@ -45,6 +84,19 @@ env/
 
 *.jsonl
 *.log
+*.sqlite
+*.sqlite3
+.coverage
+coverage.xml
+htmlcov/
+test_output/
+artifacts/**/*.jsonl
+artifacts/**/*.log
+artifacts/test_output/
+artifacts/scraping/
+
+# Temporary planning notes
+docs/scraping/temp/
 
 node_modules/
 npm-debug.log*

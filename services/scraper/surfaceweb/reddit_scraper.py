@@ -1,165 +1,177 @@
-import requests
+from __future__ import annotations
+
+import os
 import time
-import json
-import random
-from datetime import datetime
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Any
 
-# 🔥 Seen posts (dedup)
-seen = set()
+import requests
 
-# 🔥 Keywords
-KEYWORDS = [
-    "hack", "cyber", "attack", "breach",
-    "war", "military", "exploit", "leak"
+
+DEFAULT_KEYWORDS = [
+    "hack",
+    "cyber",
+    "attack",
+    "breach",
+    "war",
+    "military",
+    "exploit",
+    "leak",
 ]
 
-# 🔥 Subreddits
-SUBREDDITS = ["worldnews", "technology"]
 
-# 🔥 Proper browser headers (IMPORTANT)
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                  "AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/122.0 Safari/537.36"
-}
+@dataclass
+class RedditCollectorResult:
+    items: list[dict[str, Any]] = field(default_factory=list)
+    errors: list[dict[str, Any]] = field(default_factory=list)
 
 
-# 🔹 Keyword filter
-def is_relevant(text):
-    text = text.lower()
-    return any(k in text for k in KEYWORDS)
+class RedditScraper:
+    def __init__(
+        self,
+        session: requests.Session | None = None,
+        user_agent: str | None = None,
+        timeout_seconds: int = 15,
+        retries: int = 2,
+        rate_limit_seconds: float = 1.0,
+    ):
+        self.session = session or requests.Session()
+        self.user_agent = user_agent or os.getenv("REDDIT_USER_AGENT", "TrinetraOSINT/1.0")
+        self.timeout_seconds = timeout_seconds
+        self.retries = retries
+        self.rate_limit_seconds = rate_limit_seconds
+        self.seen = set()
 
+    def collect(
+        self,
+        subreddits: list[str] | None = None,
+        query: str = "",
+        keywords: list[str] | None = None,
+        limit: int = 25,
+        pages: int = 1,
+        sort: str = "new",
+    ) -> RedditCollectorResult:
+        result = RedditCollectorResult()
+        keywords = keywords if keywords is not None else DEFAULT_KEYWORDS
 
-# 🔹 Safe request handler
-def safe_request(url, retries=3):
-    for attempt in range(retries):
-        try:
-            res = requests.get(url, headers=HEADERS, timeout=10)
+        for subreddit in subreddits or []:
+            self.fetch_subreddit(result, subreddit, keywords, limit, pages, sort)
 
-            if res.status_code == 200:
-                return res.json()
+        if query:
+            self.fetch_search(result, query, keywords, limit, pages, sort)
 
-            elif res.status_code == 429:
-                wait = (attempt + 1) * 5
-                print(f"⏳ Rate limited. Waiting {wait}s...")
-                time.sleep(wait)
+        return result
 
-            else:
-                print(f"⚠️ Error {res.status_code} → {url}")
-                return None
+    def fetch_subreddit(self, result, subreddit: str, keywords: list[str], limit: int, pages: int, sort: str) -> None:
+        after = ""
 
-        except Exception as e:
-            print("❌ Request error:", e)
-
-    return None
-
-
-# 🔹 Fetch from subreddits (with pagination)
-def fetch_subreddits():
-    results = []
-
-    for sub in SUBREDDITS:
-        print(f"📡 Fetching r/{sub}")
-
-        after = None
-
-        for _ in range(1):  # pages per subreddit
-            url = f"https://www.reddit.com/r/{sub}/new.json?limit=25"
-
+        for _ in range(max(1, pages)):
+            params = {"limit": min(limit, 100)}
             if after:
-                url += f"&after={after}"
+                params["after"] = after
 
-            data = safe_request(url)
-
+            data = self.safe_request(f"https://www.reddit.com/r/{subreddit}/{sort}.json", params, result)
             if not data:
-                break
+                return
 
-            after = data["data"]["after"]
+            after = data.get("data", {}).get("after") or ""
+            self.add_posts(result, data, keywords, subreddit=subreddit)
 
-            for post in data["data"]["children"]:
-                p = post["data"]
-                post_id = p["id"]
+            if not after:
+                return
 
-                if post_id not in seen and is_relevant(p["title"]):
-                    seen.add(post_id)
+    def fetch_search(self, result, query: str, keywords: list[str], limit: int, pages: int, sort: str) -> None:
+        after = ""
 
-                    results.append({
-                        "id": post_id,
-                        "text": p["title"],
-                        "subreddit": sub,
-                        "source": "reddit",
-                        "timestamp": p["created_utc"],
-                        "url": p["url"],
-                        "score": p["score"],
-                        "collected_at": datetime.utcnow().isoformat()
-                    })
+        for _ in range(max(1, pages)):
+            params = {
+                "q": query,
+                "sort": sort,
+                "limit": min(limit, 100),
+            }
+            if after:
+                params["after"] = after
 
-            time.sleep(random.uniform(1, 2))  # 🔥 avoid blocking
+            data = self.safe_request("https://www.reddit.com/search.json", params, result)
+            if not data:
+                return
 
-    return results
+            after = data.get("data", {}).get("after") or ""
+            self.add_posts(result, data, keywords)
 
+            if not after:
+                return
 
-# 🔹 Fetch via search (whole Reddit)
-def fetch_search():
-    results = []
+    def safe_request(self, url: str, params: dict[str, Any], result: RedditCollectorResult) -> dict[str, Any] | None:
+        for attempt in range(self.retries + 1):
+            try:
+                response = self.session.get(
+                    url,
+                    params=params,
+                    headers={"User-Agent": self.user_agent, "Accept": "application/json"},
+                    timeout=self.timeout_seconds,
+                )
+                if response.status_code == 200:
+                    if self.rate_limit_seconds:
+                        time.sleep(self.rate_limit_seconds)
+                    return response.json()
 
-    for keyword in KEYWORDS:
-        print(f"🔎 Searching: {keyword}")
+                recoverable = response.status_code in {408, 429, 500, 502, 503, 504}
+                result.errors.append({
+                    "code": f"http_{response.status_code}",
+                    "message": f"Reddit returned HTTP {response.status_code}",
+                    "recoverable": recoverable,
+                    "url": url,
+                })
+                if not recoverable:
+                    return None
 
-        url = f"https://www.reddit.com/search.json?q={keyword}&sort=new&limit=10"
-
-        data = safe_request(url)
-
-        if not data:
-            continue
-
-        for post in data["data"]["children"]:
-            p = post["data"]
-            post_id = p["id"]
-
-            if post_id not in seen:
-                seen.add(post_id)
-
-                results.append({
-                    "id": post_id,
-                    "text": p["title"],
-                    "subreddit": p["subreddit"],
-                    "source": "reddit",
-                    "timestamp": p["created_utc"],
-                    "url": p["url"],
-                    "score": p["score"],
-                    "collected_at": datetime.utcnow().isoformat()
+            except Exception as error:
+                result.errors.append({
+                    "code": error.__class__.__name__,
+                    "message": str(error),
+                    "recoverable": True,
+                    "url": url,
                 })
 
-        time.sleep(random.uniform(2, 4))  # 🔥 avoid blocking
+            if attempt < self.retries:
+                time.sleep(min(2 ** attempt, 8))
 
-    return results
+        return None
 
+    def add_posts(self, result: RedditCollectorResult, data: dict[str, Any], keywords: list[str], subreddit: str = "") -> None:
+        for child in data.get("data", {}).get("children", []):
+            post = child.get("data", {})
+            post_id = post.get("id", "")
+            title = post.get("title", "")
 
-# 🔹 Save data
-def save(data):
-    if not data:
-        print("⚠️ No new relevant posts")
-        return
+            if not post_id or post_id in self.seen:
+                continue
 
-    with open("reddit_osint.jsonl", "a") as f:
-        for item in data:
-            print("\n", json.dumps(item, indent=2))
-            f.write(json.dumps(item) + "\n")
+            if keywords and not self.is_relevant(title, keywords):
+                continue
 
+            self.seen.add(post_id)
+            result.items.append({
+                "id": post_id,
+                "text": title,
+                "subreddit": post.get("subreddit", subreddit),
+                "source": "reddit",
+                "timestamp": post.get("created_utc", ""),
+                "url": post.get("url", ""),
+                "permalink": self.build_permalink(post.get("permalink", "")),
+                "score": post.get("score", 0),
+                "collected_at": datetime.now(timezone.utc).isoformat(),
+            })
 
-# 🔁 MAIN LOOP
-while True:
-    print("\n🚀 Collecting OSINT Reddit Data...\n")
+    def is_relevant(self, text: str, keywords: list[str]) -> bool:
+        text = (text or "").lower()
+        return any(keyword.lower() in text for keyword in keywords)
 
-    data = fetch_subreddits()   # ONLY this, remove search for now
-
-    print(f"\nCollected: {len(data)} posts\n")
-
-    if data:
-        save(data)
-    else:
-        print("⚠️ No data fetched (likely rate-limited)")
-
-    print("⏳ Sleeping...\n")
-    time.sleep(120)
+    def build_permalink(self, permalink: str) -> str:
+        if not permalink:
+            return ""
+        if permalink.startswith("http"):
+            return permalink
+        return f"https://www.reddit.com{permalink}"

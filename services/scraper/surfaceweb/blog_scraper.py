@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 
 from services.common.text_cleaner import clean_text
 from services.common.date_time import parse_date
+from services.scraper.extractors.blog_extractor import BlogExtractor
 
 
 class BlogScraper:
@@ -36,6 +37,7 @@ class BlogScraper:
     def __init__(self, response):
         self.response = response
         self._json_ld = self._load_json_ld()
+        self.extractor = BlogExtractor(response.text, response.url)
 
     def first_css(self, selectors):
         for selector in selectors:
@@ -353,7 +355,7 @@ class BlogScraper:
     def get_blog_data(self):
         images = self.get_images()
 
-        return {
+        data = {
             "title": self.get_title(),
             "text": self.get_text(),
             "author": self.get_author(),
@@ -369,6 +371,16 @@ class BlogScraper:
             "domain": self.get_domain(),
             "json_ld": self.get_json_ld(),
         }
+
+        if self.extractor.available:
+            scrapling_data = self.extractor.extract()
+            if scrapling_data:
+                for key, value in scrapling_data.items():
+                    if value not in ("", None, [], {}):
+                        data[key] = value
+                data.setdefault("provenance", self.extractor.provenance())
+
+        return data
 
     def get_data(self):
         return self.get_blog_data()
