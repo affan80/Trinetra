@@ -1,13 +1,57 @@
 import json
 import logging
 import os
+<<<<<<< HEAD
 from datetime import datetime, timezone
+=======
+from kafka import KafkaProducer
+>>>>>>> a6911bd (create kafka piplines and add apche spark)
 from services.shared.redis_queue import RedisQueue
 from services.shared.redis_metrics import RedisMetrics
 from services.shared.redis_client import ping_redis
 from services.shared.redis_dedupe import RedisDedupe
 
 logger = logging.getLogger(__name__)
+
+class KafkaPipeline:
+    """
+    Optimized Kafka Pipeline with connection pooling and async flushing.
+    """
+    def __init__(self):
+        self.bootstrap_servers = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092").split(",")
+        self.topic = os.getenv("KAFKA_TOPIC", "scraped_data")
+        self.producer = None
+
+    def open_spider(self, spider):
+        try:
+            self.producer = KafkaProducer(
+                bootstrap_servers=self.bootstrap_servers,
+                value_serializer=lambda x: json.dumps(x, default=str).encode('utf-8'),
+                acks='all',
+                retries=5,
+                linger_ms=10,
+                compression_type='gzip'
+            )
+            logger.info(f"Scalable Kafka Producer initialized for {self.bootstrap_servers}")
+        except Exception as e:
+            logger.error(f"Kafka Initialization Failed: {e}")
+
+    def process_item(self, item, spider):
+        if self.producer:
+            try:
+                # Use callbacks for non-blocking confirmation
+                self.producer.send(self.topic, value=dict(item)).add_errback(self._on_error)
+            except Exception as e:
+                logger.error(f"Kafka Produce Error: {e}")
+        return item
+
+    def _on_error(self, exc):
+        logger.error(f"Async Kafka Error: {exc}")
+
+    def close_spider(self, spider):
+        if self.producer:
+            self.producer.flush(timeout=10)
+            self.producer.close()
 
 class OsintPipeline:
     """

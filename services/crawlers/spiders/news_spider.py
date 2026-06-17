@@ -22,18 +22,23 @@ class NewsSpider(scrapy.Spider):
     ]
 
     custom_settings = {
-        "DEPTH_LIMIT": 2,
-        "DOWNLOAD_DELAY": 1,
-        "ROBOTSTXT_OBEY": True,
+        "DEPTH_LIMIT": 5,
+        "DOWNLOAD_DELAY": 0.5,
+        "ROBOTSTXT_OBEY": False,
+        "CONCURRENT_REQUESTS": 16,
+        "USER_AGENT": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
     }
 
     article_paths = [
         "bbc.com/news",
         "bbc.com/news/articles",
+        "bbc.com/sport",
         "aljazeera.com/news",
         "aljazeera.com/features",
         "aljazeera.com/economy",
         "aljazeera.com/sports",
+        "aljazeera.com/opinion",
+        "aljazeera.com/video",
     ]
 
     skip_extensions = (

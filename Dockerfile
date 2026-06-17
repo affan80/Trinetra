@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc curl \
+    && apt-get install -y --no-install-recommends gcc curl default-jre \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .

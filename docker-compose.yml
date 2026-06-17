@@ -14,6 +14,73 @@ services:
       retries: 5
     restart: unless-stopped
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: osint_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: osint_kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  spark-master:
+    image: bitnami/spark:3.5.0
+    container_name: osint_spark_master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+
+  spark-worker:
+    image: bitnami/spark:3.5.0
+    container_name: osint_spark_worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    depends_on:
+      - spark-master
+
+  spark-processor:
+    build: .
+    container_name: osint_spark_processor
+    command: python -m services.worker_service.spark_processor
+    env_file:
+      - .env
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      PYTHONPATH: /app
+    depends_on:
+      kafka:
+        condition: service_started
+      spark-master:
+        condition: service_started
+    restart: unless-stopped
+
   api:
     build: .
     container_name: osint_api
@@ -25,6 +92,7 @@ services:
         required: false
     environment:
       REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       PYTHONPATH: /app
       SCRAPLING_PARSER_ENABLED: ${SCRAPLING_PARSER_ENABLED:-true}
       SCRAPLING_FETCH_FALLBACK_ENABLED: ${SCRAPLING_FETCH_FALLBACK_ENABLED:-false}
@@ -45,6 +113,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      kafka:
+        condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -61,6 +131,7 @@ services:
         required: false
     environment:
       REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       PYTHONPATH: /app
       SCRAPLING_PARSER_ENABLED: ${SCRAPLING_PARSER_ENABLED:-true}
       SCRAPLING_FETCH_FALLBACK_ENABLED: ${SCRAPLING_FETCH_FALLBACK_ENABLED:-false}
@@ -81,6 +152,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      kafka:
+        condition: service_started
     restart: unless-stopped
 
   crawler:
@@ -92,6 +165,7 @@ services:
         required: false
     environment:
       REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       PYTHONPATH: /app
       SCRAPLING_PARSER_ENABLED: ${SCRAPLING_PARSER_ENABLED:-true}
       SCRAPLING_FETCH_FALLBACK_ENABLED: ${SCRAPLING_FETCH_FALLBACK_ENABLED:-false}
@@ -112,6 +186,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      kafka:
+        condition: service_started
     profiles:
       - crawlers
 
