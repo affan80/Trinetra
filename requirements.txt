@@ -12,7 +12,7 @@ Pillow==10.4.0
 python-dotenv==1.0.1
 
 # Kafka and Spark Dependencies
-kafka-python==2.0.2
+kafka-python-ng==2.2.3
 pyspark==3.5.0
 
 # Redis and API Dependencies

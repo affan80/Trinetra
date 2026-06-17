@@ -1,11 +1,9 @@
 import json
 import logging
 import os
-<<<<<<< HEAD
 from datetime import datetime, timezone
-=======
 from kafka import KafkaProducer
->>>>>>> a6911bd (create kafka piplines and add apche spark)
+from scrapy.exceptions import DropItem
 from services.shared.redis_queue import RedisQueue
 from services.shared.redis_metrics import RedisMetrics
 from services.shared.redis_client import ping_redis
@@ -18,8 +16,8 @@ class KafkaPipeline:
     Optimized Kafka Pipeline with connection pooling and async flushing.
     """
     def __init__(self):
-        self.bootstrap_servers = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092").split(",")
-        self.topic = os.getenv("KAFKA_TOPIC", "scraped_data")
+        self.bootstrap_servers = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:29092").split(",")
+        self.topic = os.getenv("KAFKA_TOPIC", "scraped_data_raw")
         self.producer = None
 
     def open_spider(self, spider):
@@ -90,24 +88,24 @@ class OsintPipeline:
         """
         Processes each scraped item: saves to file and pushes to Redis.
         """
+        # 1. Validation Logic
+        if not self.is_valid_item(item):
+            self.track_metric("invalid_items")
+            raise DropItem(f"Invalid item: {item.get('url')}")
+
+        # 2. Add Audit Metadata (modifies item in place)
+        self.add_audit_metadata(item)
         article = dict(item)
 
-        # 1. Validation Logic
-        if not self.is_valid_item(article):
-            self.track_metric("invalid_items")
-            return item
-
-        self.add_audit_metadata(article)
-
-        # 2. Local File Storage
+        # 3. Local File Storage
         if self.file:
             try:
-                line = json.dumps(article, ensure_ascii=False)
+                line = json.dumps(article, ensure_ascii=False, default=str)
                 self.file.write(line + "\n")
             except Exception as e:
                 logger.error(f"Failed to write item to file {self.filename}: {e}")
 
-        # 3. Redis Integration (with error handling)
+        # 4. Redis Integration (with error handling)
         if self.redis_available:
             try:
                 dedupe_url = self.get_dedupe_url(article)
@@ -115,7 +113,7 @@ class OsintPipeline:
 
                 if dedupe_url and not self.dedupe.is_new_url(dedupe_url, source=source):
                     self.metrics.increment("duplicate_items")
-                    return item
+                    raise DropItem(f"Duplicate item: {dedupe_url}")
 
                 self.queue.push(article)
                 
@@ -123,6 +121,8 @@ class OsintPipeline:
                 self.metrics.increment("scraped_items")
                 self.metrics.increment_source(source)
                 self.track_provenance_metrics(article)
+            except DropItem:
+                raise
             except Exception as e:
                 logger.error(f"Redis operation failed in pipeline: {e}")
                 self.redis_available = False
@@ -153,12 +153,16 @@ class OsintPipeline:
         if self.file:
             self.file.close()
 
-    def add_audit_metadata(self, article):
-        metadata = article.setdefault("metadata", {})
+    def add_audit_metadata(self, item):
+        # Handle Scrapy Items where fields might exist but be None
+        if item.get("metadata") is None:
+            item["metadata"] = {}
+        
+        metadata = item["metadata"]
         metadata.setdefault("collected_at", datetime.now(timezone.utc).isoformat())
         metadata.setdefault("validation_status", "valid")
 
-        source_url = article.get("url") or article.get("page_url") or article.get("image_url", "")
+        source_url = item.get("url") or item.get("page_url") or item.get("image_url", "")
         metadata.setdefault("source_url", source_url)
         metadata.setdefault("canonical_url", metadata.get("canonical_url") or source_url)
 

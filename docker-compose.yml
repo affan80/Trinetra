@@ -73,7 +73,12 @@ services:
       - .env
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC_PROCESSED: scraped_data_processed
+      SPARK_CHECKPOINT_DIR: /app/data/spark-checkpoints
       PYTHONPATH: /app
+    volumes:
+      - .:/app
+      - spark_checkpoints:/app/data/spark-checkpoints
     depends_on:
       kafka:
         condition: service_started
@@ -193,3 +198,4 @@ services:
 
 volumes:
   redis_data:
+  spark_checkpoints:

@@ -5,7 +5,7 @@ class Config:
     REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     
     # Kafka
-    KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092").split(",")
+    KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:29092").split(",")
     KAFKA_TOPIC_RAW = os.getenv("KAFKA_TOPIC_RAW", "scraped_data_raw")
     KAFKA_TOPIC_PROCESSED = os.getenv("KAFKA_TOPIC_PROCESSED", "scraped_data_processed")
     

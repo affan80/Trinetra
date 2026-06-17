@@ -21,7 +21,7 @@ def test_producer():
     }
     
     print("Sending test message to Kafka...")
-    producer.send('scraped_data', value=test_data)
+    producer.send('scraped_data_raw', value=test_data)
     producer.flush()
     print("Message sent.")
 
