@@ -13,7 +13,24 @@ Instead of just giving you a list of links, Trinetra builds an **Intelligence Gr
 *   **Monitors Social Media**: Tracks how stories spread and identifies who is behind coordinated campaigns.
 *   **Maps Everything**: Visualizes events and claims on a map so you have instant situational awareness.
 *   **Speaks the Language**: Handles English, Hindi, and regional languages to cover all of India's information space.
+*   **Entity Intelligence**: Automatically extracts people, organizations, and locations from text using advanced NLP.
 *   **Ready-to-Use Reports**: Generates daily briefs and incident reports so you can make decisions immediately.
+
+---
+
+## Setting up NER Intelligence
+
+To enable the new Named Entity Recognition (NER) pipeline:
+
+1.  **Install dependencies** (included in `requirements.txt`):
+    ```bash
+    pip install -r requirements.txt
+    ```
+2.  **Download the Spacy English model**:
+    ```bash
+    python -m spacy download en_core_web_sm
+    ```
+    *If not installed, the NER pipeline will gracefully skip processing without impacting the crawl.*
 
 ---
 

@@ -111,7 +111,27 @@ To add a new spider to the automated test script (`run_tests.sh`):
 
 ---
 
-## 5. Tips for Success
+## 5. Parser Pipelines
+
+The parser service has been enhanced to include a robust pipeline architecture.
+
+### Pipeline Order (settings.py)
+1.  **`EnrichmentPipeline` (250)**: Normalizes text and adds collection metadata (`enriched_at`).
+2.  **`EntityExtractionPipeline` (275)**: Extracts entities (PERSON, ORG, LOC/GPE) from `text` using Spacy NLP and adds them to `metadata['entities']`.
+3.  **`OsintPipeline` (300)**: Core processing, validation, local storage, and Redis push.
+4.  **`KafkaPipeline` (400)**: Pushes validated items to Kafka for downstream processing.
+5.  **`DLQPipeline` (500)**: Routes failed items (validation status 'failed') to a dead-letter-ready state.
+
+### Important: Enabling NER
+The `EntityExtractionPipeline` requires the Spacy `en_core_web_sm` model:
+```bash
+python -m spacy download en_core_web_sm
+```
+*If missing, this pipeline will be automatically disabled, and other pipelines will continue to operate normally.*
+
+---
+
+## 6. Tips for Success
 
 *   **Python Path**: Always run `export PYTHONPATH="."` before manual scrapy commands so the system can find its internal parts.
 *   **Redis URL**: Local commands default to `redis://localhost:6379/0`. Override with `export REDIS_URL="redis://host:port/db"` if needed.
