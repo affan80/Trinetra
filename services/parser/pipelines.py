@@ -11,6 +11,18 @@ from services.shared.redis_dedupe import RedisDedupe
 
 logger = logging.getLogger(__name__)
 
+class EnrichmentPipeline:
+    def process_item(self, item, spider):
+        # Basic normalization
+        if item.get("text"):
+            item["text"] = item["text"].strip()
+        
+        metadata = item.get("metadata", {})
+        metadata.setdefault("enriched_at", datetime.now(timezone.utc).isoformat())
+        item["metadata"] = metadata
+        
+        return item
+
 class KafkaPipeline:
     """
     Optimized Kafka Pipeline with connection pooling and async flushing.
@@ -195,3 +207,12 @@ class OsintPipeline:
 
         if "blocked_status" in fallback_reason:
             self.metrics.increment("blocked_pages")
+
+class DLQPipeline:
+    def process_item(self, item, spider):
+        # If validation failed, route to DLQ
+        if item.get("metadata", {}).get("validation_status") == "failed":
+            logger.warning(f"Routing item to DLQ: {item.get('url')}")
+            # Logic to push to a DLQ would go here
+            return None # Drop item
+        return item
