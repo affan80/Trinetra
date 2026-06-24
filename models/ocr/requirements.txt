@@ -1,0 +1,9 @@
+paddleocr
+paddlepaddle-gpu
+opencv-python
+pillow
+langdetect
+deep-translator
+gliner
+torch
+transformers
