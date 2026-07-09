@@ -26,9 +26,7 @@ neo4j-admin dbms set-initial-password neo4j123
 
 ### 4. Connected to Neo4j Browser
 
-* URL: bolt://localhost:7687
-* Username: neo4j
-* Password: neo4j123
+
 
 Verified using:
 
