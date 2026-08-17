@@ -1,6 +1,13 @@
 # Scraper and Crawler Dependencies
 scrapy==2.16.0
+trafilatura==1.12.0
 scrapling[fetchers]==0.4.9
+feedparser==6.0.11
+minio==7.2.11
+geopy==2.4.1
+psycopg2-binary==2.9.10
+neo4j==5.27.0
+pydantic==2.10.0
 python-dateutil==2.9.0.post0
 requests==2.32.5
 lxml==6.1.1
@@ -9,11 +16,15 @@ parsel==1.11.0
 w3lib==2.4.1
 telethon==1.36.0
 Pillow==10.4.0
+PyMuPDF==1.24.14
 python-dotenv==1.0.1
+pytest==8.3.4
+textual==0.89.1
+python-multipart==0.0.20
 
 # Kafka and Spark Dependencies
 kafka-python-ng==2.2.3
-pyspark==3.5.0
+pyspark==3.5.3
 
 # Redis and API Dependencies
 redis==5.0.1

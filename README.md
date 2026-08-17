@@ -1,108 +1,206 @@
-# Trinetra: Intelligent OSINT for the Modern Age 👁️
+# Trinetra
 
-Trinetra is an India-focused AI platform built for the **Indian Air Force**. It takes scattered public data—news, social media, images, and videos—and turns it into clear, verified, and linked intelligence.
+Trinetra is a containerized OSINT investigation platform. The default V1 stack
+provides the API, Redis, and the analyst TUI. The legacy pipeline additionally
+starts Kafka, Spark, crawler, worker, PostGIS, Neo4j, and MinIO.
 
-Instead of just giving you a list of links, Trinetra builds an **Intelligence Graph**. It connects the dots between people, places, claims, and media so you can see the full story, not just the fragments.
+## Choose a stack
 
----
+Use one stack at a time: both publish the API on port `8000`.
 
-## What Trinetra Does for You
+| Stack | Compose file | Use it for |
+| --- | --- | --- |
+| **V1 (recommended)** | `docker-compose.v1.yml` | Multimodal investigations and the Textual analyst TUI |
+| Legacy pipeline | `docker-compose.yml` | Kafka/Spark ingestion, crawler, and supporting data services |
 
-*   **Verifies Information**: Automatically checks if a source is credible or if a piece of media is fake.
-*   **Connects the Dots**: Links related posts, events, and locations into a single "Intelligence Graph."
-*   **Monitors Social Media**: Tracks how stories spread and identifies who is behind coordinated campaigns.
-*   **Maps Everything**: Visualizes events and claims on a map so you have instant situational awareness.
-*   **Speaks the Language**: Handles English, Hindi, and regional languages to cover all of India's information space.
-*   **Entity Intelligence**: Automatically extracts people, organizations, and locations from text using advanced NLP.
-*   **Ready-to-Use Reports**: Generates daily briefs and incident reports so you can make decisions immediately.
+## Run V1 from scratch (recommended)
 
----
+### 1. Install prerequisites
 
-## Setting up NER Intelligence
+- Docker Engine 24+ with the Docker Compose plugin (`docker compose version`)
+- Python 3.11, only if you want to run the host-side TUI
 
-To enable the new Named Entity Recognition (NER) pipeline:
+On Linux, allow your user to run Docker without `sudo`, then **sign out and
+sign back in** (or reboot):
 
-1.  **Install dependencies** (included in `requirements.txt`):
-    ```bash
-    pip install -r requirements.txt
-    ```
-2.  **Download the Spacy English model**:
-    ```bash
-    python -m spacy download en_core_web_sm
-    ```
-    *If not installed, the NER pipeline will gracefully skip processing without impacting the crawl.*
+```bash
+sudo usermod -aG docker "$USER"
+```
 
----
+Verify the installation:
 
-## Key Dimensions of Intelligence
+```bash
+docker version
+docker compose version
+docker ps
+```
 
-Trinetra is built on these foundational dimensions to ensure public data is transformed into actionable intelligence:
+If `docker ps` reports permission denied, the group change has not taken effect
+yet. Start a new login session, or use `sudo docker ...` for the commands below.
 
-| Dimension | Meaning for Trinetra | Why it Matters |
-| :--- | :--- | :--- |
-| **Multi-source Ingestion** | Collect public data from news, RSS, web, social media, video, images, and public datasets. | OSINT value depends on coverage across fragmented public sources. |
-| **Credibility Scoring** | Score source reliability, claim confidence, media authenticity, and misinformation risk. | Prevents raw collection from becoming unverified noise. |
-| **Intelligence Graph** | Connect sources, claims, entities, events, locations, media, narratives, and evidence. | Allows analysts to investigate relationships and chains of evidence. |
-| **Real-time Alerting** | Detect emerging events and narrative spikes quickly. | Information warfare and crises move faster than manual monitoring cycles. |
-| **Social Media Intelligence** | Track hashtags, influencer nodes, amplification patterns, and coordinated campaigns. | Narratives often emerge on social platforms before formal reporting. |
-| **Multilingual Monitoring** | Handle Hindi, English, regional Indian languages, and adversarial foreign languages. | India-focused OSINT requires language coverage beyond English. |
-| **Multimodal Analysis** | Analyze text, image, video, audio, OCR, ASR, and metadata. | Modern misinformation is often visual or cross-media. |
-| **Geospatial Intelligence** | Map events, claims, source origins, and heatmaps. | Defence users need location-first situational awareness. |
-| **Timeline Analysis** | Reconstruct first-seen time, amplification timeline, and event progression. | Temporal order is critical for verifying claims and identifying origins. |
-| **Analyst Workflow** | Support case folders, notes, review queues, evidence boards, and escalation. | AI outputs must fit intelligence workflows. |
-| **Report Generation** | Generate daily briefs, incident reports, source reliability reports, and misinformation reports. | Analysts need decision-ready outputs, not just dashboards. |
+### 2. Start the API and Redis
 
----
+From the repository root:
 
-## Quick Start (Using Docker)
+```bash
+docker compose -f docker-compose.v1.yml up -d --build
+docker compose -f docker-compose.v1.yml ps
+```
 
-The easiest way to get Trinetra running is with **Docker**.
+Expected status:
 
-### 1. Setup
-*   Clone this folder to your computer.
-*   Create a file named `.env` in the main folder and add these lines:
-    ```env
-    REDIS_URL=redis://redis:6379/0
-    TELEGRAM_API_ID=your_id_here
-    TELEGRAM_API_HASH=your_hash_here
-    ```
+```text
+NAME                 STATUS
+trinetra-api-1       Up
+trinetra-redis-1     Up (healthy)
+```
 
-### 2. Start the System
-Open your terminal in the project folder and run:
+Check the API:
+
+```bash
+curl --fail http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/
+```
+
+The health response should contain `"status":"healthy"`. Interactive API
+documentation is available at <http://127.0.0.1:8000/docs>.
+
+### 3. Start the analyst TUI
+
+The TUI runs on your host terminal and connects to the API at
+`http://127.0.0.1:8000` by default.
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-v1.txt
+python -m tui.app.main
+```
+
+In the TUI, select an intake type, enter a title and target, then provide one
+of the following:
+
+- **Upload**: a readable local path to an image, video, audio file, PDF, or document
+- **URL**: a public `http` or `https` URL
+- **Text**: analyst-provided text
+
+Useful keyboard shortcuts: `1` dashboard, `2` new investigation, `4` evidence,
+`7` media analysis, `R` report, `L` agent logs, and `Q` quit.
+
+To point the TUI at a different API host:
+
+```bash
+TRINETRA_API_URL=http://server-name:8000 python -m tui.app.main
+```
+
+### 4. View live service output
+
+```bash
+docker compose -f docker-compose.v1.yml logs -f --tail=100
+```
+
+Stop the V1 stack while retaining investigation artifacts:
+
+```bash
+docker compose -f docker-compose.v1.yml down
+```
+
+To delete the V1 containers **and all persisted raw investigation artifacts**:
+
+```bash
+docker compose -f docker-compose.v1.yml down -v
+```
+
+## Run the legacy pipeline from scratch
+
+First stop V1 if it is running, because both stacks use port `8000`:
+
+```bash
+docker compose -f docker-compose.v1.yml down
+```
+
+Build and start the full pipeline:
+
 ```bash
 docker compose up -d --build
+docker compose ps
 ```
-*This starts the Database (Redis), the API, and the background Workers.*
 
-### 3. Start Scraping Data
-You can run all the data collectors (spiders) at once:
+Monitor services in a terminal-style view:
+
 ```bash
-docker compose --profile crawlers up
+watch -n 2 'docker compose ps'
 ```
 
----
+Follow the services most likely to expose startup errors:
 
-## Running Locally (Without Docker)
+```bash
+docker compose logs -f --tail=100 api crawler spark-processor worker
+```
 
-If you prefer to run it directly on your machine:
+Verify the API after the services have started:
 
-1.  **Install dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
-2.  **Run the test script**:
-    This will start all scrapers in parallel and connect to your Redis:
-    ```bash
-    bash run_tests.sh
-    ```
+```bash
+curl --fail http://127.0.0.1:8000/health
+```
 
----
+Expected service behaviour:
 
-## How to Monitor
+| Service | Expected status |
+| --- | --- |
+| `api`, `worker`, `spark-master`, `spark-worker`, `spark-processor` | `Up` |
+| `redis` | `Up (healthy)` |
+| `kafka`, `zookeeper`, `postgis`, `neo4j`, `minio` | `Up` |
+| `crawler` | `Exited (0)` after its bounded crawl, or `Up` while crawling |
 
-*   **Live Stats**: Open [http://localhost:8000/stats](http://localhost:8000/stats) in your browser.
-*   **System Logs**: Run `docker compose logs -f` to see what's happening under the hood.
+`crawler` uses `restart: on-failure`; it must not continuously restart after a
+successful crawl. If any service shows `Restarting` or `Exited (1)`, capture its
+last logs before changing configuration:
 
----
+```bash
+docker compose logs --tail=200 crawler spark-processor api worker
+```
 
-**Trinetra** is about moving from "searching for data" to "understanding intelligence." 🇮🇳
+Service URLs and local development credentials:
+
+| Service | Address | Credentials |
+| --- | --- | --- |
+| API | <http://localhost:8000/docs> | None |
+| Spark master | <http://localhost:8080> | None |
+| MinIO console | <http://localhost:9001> | `minioadmin` / `minioadmin` |
+| Neo4j browser | <http://localhost:7474> | `neo4j` / `password` |
+| PostGIS | `localhost:5432` | `osint_user` / `osint_password` |
+
+Stop the legacy stack while keeping database volumes:
+
+```bash
+docker compose down
+```
+
+To reset the legacy stack completely, including Redis, Spark checkpoints,
+PostGIS, Neo4j, and MinIO data (**destructive**):
+
+```bash
+docker compose down -v
+docker compose up -d --build
+```
+
+## Troubleshooting
+
+| Symptom | Resolution |
+| --- | --- |
+| `permission denied ... /var/run/docker.sock` | Run `sudo usermod -aG docker "$USER"`, log out and back in, then rerun `docker ps`. |
+| `port is already allocated` on `8000` | Stop the other stack with `docker compose -f docker-compose.v1.yml down` or `docker compose down`. |
+| API health check fails | Run `docker compose logs --tail=200 api` for the active stack. |
+| Spark processor restarts | Run `docker compose logs --tail=200 spark-processor`; verify Kafka and Spark master are `Up`. |
+| Crawler restarts | Run `docker compose logs --tail=200 crawler`; a successful finite crawl should finish as `Exited (0)`. |
+
+For infrastructure-specific notes, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+
+## Kubernetes
+
+Legacy Kubernetes manifests are in `k8s/base/`:
+
+```bash
+kubectl apply -f k8s/base/
+```
