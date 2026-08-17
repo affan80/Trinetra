@@ -1,0 +1,14 @@
+Screen {
+    background: #111820;
+    color: #d7e3f0;
+}
+
+#workstation { height: 1fr; }
+#navigation { width: 29; padding: 2 2; background: #162331; color: #94c5f8; }
+#main { width: 1fr; padding: 1 3; }
+#status { height: 1; color: #94c5f8; }
+#intake-panel { height: 17; border: round #4e91d3; padding: 1 2; }
+#intake-panel Input, #intake-panel Select { margin-bottom: 1; }
+#text { height: 4; margin-bottom: 1; }
+#content { height: 1fr; margin-top: 1; padding: 1 2; border: round #31536f; overflow-y: auto; }
+.title { text-style: bold; color: #6db4f7; margin-bottom: 1; }

@@ -8,11 +8,18 @@ from pyspark.sql.types import StructType, StructField, StringType, ArrayType, Ma
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("SparkProcessor")
 
+SPARK_VERSION = "3.5.3"
+
 def create_spark_session():
     """Create and return a Scalable Spark session."""
+    spark_master_url = os.getenv("SPARK_MASTER_URL", "spark://spark-master:7077")
     return SparkSession.builder \
         .appName("OsintSparkProcessor") \
-        .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0") \
+        .master(spark_master_url) \
+        .config(
+            "spark.jars.packages",
+            f"org.apache.spark:spark-sql-kafka-0-10_2.12:{SPARK_VERSION}",
+        ) \
         .config("spark.streaming.stopGracefullyOnShutdown", "true") \
         .config("spark.sql.shuffle.partitions", "10") \
         .getOrCreate()

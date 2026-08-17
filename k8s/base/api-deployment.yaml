@@ -26,10 +26,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: aditi-api-service
+  name: trinetra-api-service
 spec:
   selector:
-    app: aditi-api
+    app: trinetra-api
   ports:
     - protocol: TCP
       port: 80

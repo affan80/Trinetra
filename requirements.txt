@@ -16,11 +16,15 @@ parsel==1.11.0
 w3lib==2.4.1
 telethon==1.36.0
 Pillow==10.4.0
+PyMuPDF==1.24.14
 python-dotenv==1.0.1
+pytest==8.3.4
+textual==0.89.1
+python-multipart==0.0.20
 
 # Kafka and Spark Dependencies
 kafka-python-ng==2.2.3
-pyspark==3.5.0
+pyspark==3.5.3
 
 # Redis and API Dependencies
 redis==5.0.1

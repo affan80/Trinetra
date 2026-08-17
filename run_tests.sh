@@ -10,9 +10,11 @@
 # ==============================================================================
 
 # Configuration
+set -euo pipefail
+
 OUTPUT_DIR="artifacts/test_output"
-VENV_PYTHON="./.venv/bin/python"
-SCRAPY="./.venv/bin/scrapy"
+VENV_PYTHON="${PYTHON:-python}"
+SCRAPY="${SCRAPY:-scrapy}"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 export PYTHONPATH="."
 export REDIS_URL="${REDIS_URL:-redis://localhost:6379/0}"
@@ -33,9 +35,9 @@ fi
 # List of spiders to test: "file_path|arguments"
 # Note: Arguments can be customized per spider.
 SPIDERS=(
-    "services/crawlers/spiders/news_spider.py|urls=https://www.bbc.com/"
-    "services/crawlers/spiders/image_spider.py|urls=https://books.toscrape.com/"
-    "services/crawlers/spiders/blog_spider.py|urls=https://www.csis.org/blogs/"
+    "services/ingestion/crawlers/spiders/news_spider.py|urls=https://www.bbc.com/"
+    "services/ingestion/crawlers/spiders/image_spider.py|urls=https://books.toscrape.com/"
+    "services/ingestion/crawlers/spiders/blog_spider.py|urls=https://www.csis.org/blogs/"
 )
 
 echo "🚀 Starting Trinetra Scraper Tests..."
@@ -45,8 +47,7 @@ echo ""
 echo "----------------------------------------------------------------------"
 echo "🧪 RUNNING: offline scraper checks"
 echo "----------------------------------------------------------------------"
-"$VENV_PYTHON" tests/smoke/test_imports.py
-"$VENV_PYTHON" tests/scraper/test_scrapers.py
+"$VENV_PYTHON" -m pytest tests/smoke tests/scraper
 
 for ENTRY in "${SPIDERS[@]}"; do
     # Split the entry into path and args
@@ -74,12 +75,8 @@ for ENTRY in "${SPIDERS[@]}"; do
         -o "$OUT_FILE" \
         --loglevel INFO
     
-    if [ $? -eq 0 ]; then
-        COUNT=$(wc -l < "$OUT_FILE" | xargs)
-        echo "✅ SUCCESS: $BASENAME completed. Scraped $COUNT items."
-    else
-        echo "❌ ERROR: $BASENAME failed. Check logs above."
-    fi
+    COUNT=$(wc -l < "$OUT_FILE" | xargs)
+    echo "✅ SUCCESS: $BASENAME completed. Scraped $COUNT items."
 done
 
 echo ""

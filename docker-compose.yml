@@ -80,6 +80,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KAFKA_TOPIC_PROCESSED: scraped_data_processed
       SPARK_CHECKPOINT_DIR: /app/data/spark-checkpoints
+      SPARK_MASTER_URL: spark://spark-master:7077
       PYTHONPATH: /app
     volumes:
       - .:/app
@@ -138,7 +139,9 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
-    restart: unless-stopped
+    # A crawl is a bounded batch job. Do not relaunch a successfully completed
+    # crawl indefinitely; restart only when it fails.
+    restart: on-failure
 
 
   postgis:

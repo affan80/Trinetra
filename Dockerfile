@@ -1,4 +1,6 @@
-FROM python:3.12-slim
+# PySpark 3.5.x supports Python through 3.11.  Keep the runtime on a supported
+# version so the driver used by spark-processor matches the Spark 3.5 cluster.
+FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -12,8 +14,8 @@ RUN apt-get update \
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-j   pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
+    pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python", "-m", "services.worker_service.alert_worker"]
+CMD ["python", "-m", "services.processing.worker_service.alert_worker"]
