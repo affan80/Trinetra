@@ -204,3 +204,5 @@ Legacy Kubernetes manifests are in `k8s/base/`:
 ```bash
 kubectl apply -f k8s/base/
 ```
+<!-- run Command -->
+i.venv/bin/pip install textual==0.89.1 && .venv/bin/python tui/app/main.py

@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc curl default-jre libxml2-dev libxslt-dev \
+    && apt-get install -y --no-install-recommends gcc build-essential curl default-jre libxml2-dev libxslt-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
