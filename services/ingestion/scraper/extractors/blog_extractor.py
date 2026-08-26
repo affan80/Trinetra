@@ -72,7 +72,7 @@ class BlogExtractor(ArticleExtractor):
             or ""
         )
 
-        author = re.sub(r"^by\s+", "", clean_text(author), flags=re.I)
+        author = re.sub(r"^by\s+", "", clean_text(author), flags=re.IGNORECASE)
         return clean_text(author)
 
     def get_modified_date(self):

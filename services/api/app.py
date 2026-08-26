@@ -2,15 +2,20 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
-from services.shared.redis_client import ping_redis, get_redis_client
-from services.shared.redis_metrics import RedisMetrics
-from services.shared.redis_queue import RedisQueue
-from services.shared.url_frontier import UrlFrontier
+
 from services.investigations import InvestigationRepository, InvestigationWorkflow
 from services.investigations.multimodal import MultimodalIngestor
 from services.investigations.schemas import (
-    Investigation, InvestigationCreate, InvestigationStatus, TextInputRequest, UrlInputRequest,
+    Investigation,
+    InvestigationCreate,
+    InvestigationStatus,
+    TextInputRequest,
+    UrlInputRequest,
 )
+from services.shared.redis_client import ping_redis
+from services.shared.redis_metrics import RedisMetrics
+from services.shared.redis_queue import RedisQueue
+from services.shared.url_frontier import UrlFrontier
 
 app = FastAPI(title="Trinetra V1 OSINT API", version="0.1.0")
 metrics = RedisMetrics()

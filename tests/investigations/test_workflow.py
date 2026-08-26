@@ -2,7 +2,12 @@ from pathlib import Path
 
 from services.investigations.collectors import BaseCollector
 from services.investigations.repository import InvestigationRepository
-from services.investigations.schemas import Investigation, InvestigationStatus, NormalizedItem, SourceType
+from services.investigations.schemas import (
+    Investigation,
+    InvestigationStatus,
+    NormalizedItem,
+    SourceType,
+)
 from services.investigations.workflow import InvestigationWorkflow
 
 

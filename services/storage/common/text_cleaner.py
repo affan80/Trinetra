@@ -1,5 +1,6 @@
 import re
 
+
 def clean_text(text):
     """
     Cleans the given text by removing extra whitespace, HTML tags, and other noise.

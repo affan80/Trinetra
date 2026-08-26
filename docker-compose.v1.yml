@@ -3,23 +3,88 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.v1
+    container_name: trinetra_api
     ports:
       - "8000:8000"
     environment:
       REDIS_URL: redis://redis:6379/0
+      TRINETRA_UPLOAD_DIR: /app/data/raw/investigations
+      PYTHONPATH: /app
     volumes:
       - trinetra_raw:/app/data/raw/investigations
     depends_on:
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+
+  research-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.v1
+    container_name: trinetra_research_api
+    command: ["uvicorn", "backend.realtime_api:app", "--host", "0.0.0.0", "--port", "8001"]
+    ports:
+      - "8001:8001"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      CORS_ORIGINS: http://localhost:3000
+      TRINETRA_UPLOAD_DIR: /app/data/raw/realtime
+      PYTHONPATH: /app
+    volumes:
+      - trinetra_realtime_uploads:/app/data/raw/realtime
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: trinetra_frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8001
+    ports:
+      - "3000:3000"
+    depends_on:
+      research-api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  tui:
+    build:
+      context: .
+      dockerfile: Dockerfile.v1
+    container_name: trinetra_tui
+    command: ["python", "-m", "tui.app.main"]
+    environment:
+      TRINETRA_API_URL: http://api:8000
+      TERM: xterm-256color
+    stdin_open: true
+    tty: true
+    depends_on:
+      api:
+        condition: service_healthy
 
   redis:
     image: redis:8-alpine
+    container_name: trinetra_redis
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
+    restart: unless-stopped
 
 volumes:
   trinetra_raw:
+  trinetra_realtime_uploads:

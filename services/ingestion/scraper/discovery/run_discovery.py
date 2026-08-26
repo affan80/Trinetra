@@ -3,9 +3,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from typing import Iterable
+from collections.abc import Iterable
 
-from services.scraper.discovery import UrlCandidate
 from services.scraper.discovery.connectors import (
     BraveSearchConnector,
     CommonCrawlConnector,
@@ -18,7 +17,6 @@ from services.scraper.discovery.connectors import (
 from services.scraper.policy import SourceRegistry
 from services.shared.redis_metrics import RedisMetrics
 from services.shared.url_frontier import FRONTIER_METRICS, UrlFrontier
-
 
 DEFAULT_CONNECTORS = ["rss", "sitemap"]
 

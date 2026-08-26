@@ -1,6 +1,7 @@
 import json
-import time
+
 from kafka import KafkaProducer
+
 
 def test_producer():
     producer = KafkaProducer(

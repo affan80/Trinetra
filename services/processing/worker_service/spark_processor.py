@@ -1,8 +1,9 @@
-import os
 import logging
+import os
+
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import from_json, col
-from pyspark.sql.types import StructType, StructField, StringType, ArrayType, MapType
+from pyspark.sql.functions import col, from_json
+from pyspark.sql.types import ArrayType, MapType, StringType, StructField, StructType
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

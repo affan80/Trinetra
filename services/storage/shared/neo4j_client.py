@@ -4,7 +4,7 @@ import os
 from functools import lru_cache
 
 from dotenv import load_dotenv
-from neo4j import GraphDatabase, Driver
+from neo4j import Driver, GraphDatabase
 
 load_dotenv()
 

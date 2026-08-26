@@ -9,7 +9,16 @@ from datetime import timedelta
 
 from .collectors import BaseCollector, SeededCollector
 from .repository import InvestigationRepository
-from .schemas import Claim, CollectionPlan, Entity, Investigation, InvestigationStatus, Report, SourceType, utc_now
+from .schemas import (
+    Claim,
+    CollectionPlan,
+    Entity,
+    Investigation,
+    InvestigationStatus,
+    Report,
+    SourceType,
+    utc_now,
+)
 
 
 class InvestigationWorkflow:

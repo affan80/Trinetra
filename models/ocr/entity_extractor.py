@@ -1,5 +1,6 @@
 from gliner import GLiNER
 
+
 class EntityExtractor:
 
     def __init__(self):

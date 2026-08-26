@@ -4,7 +4,6 @@ from email.utils import parsedate_to_datetime
 from typing import Any
 
 from lxml import etree
-
 from services.scraper.discovery import UrlCandidate
 from services.scraper.discovery.connectors.base import HttpDiscoveryConnector
 

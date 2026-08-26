@@ -6,7 +6,6 @@ import json
 from typing import Any
 
 import redis
-
 from services.shared.redis_client import get_redis_client
 
 

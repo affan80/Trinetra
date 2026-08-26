@@ -1,8 +1,9 @@
-import time
 import logging
+import time
+
 from services.shared.redis_client import ping_redis
-from services.shared.redis_queue import RedisQueue
 from services.shared.redis_metrics import RedisMetrics
+from services.shared.redis_queue import RedisQueue
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("alert_worker")

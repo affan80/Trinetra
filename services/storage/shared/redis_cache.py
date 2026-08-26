@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import redis
-
 from services.shared.redis_client import get_redis_client
 
 

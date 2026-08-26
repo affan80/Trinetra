@@ -1,6 +1,7 @@
 import cv2
 from ocr import OCRExtractor
 
+
 class VideoOCR:
 
     def __init__(self):

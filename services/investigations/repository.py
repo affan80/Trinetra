@@ -8,7 +8,17 @@ from collections import defaultdict
 from hashlib import sha256
 from pathlib import Path
 
-from .schemas import AgentActivity, Claim, Entity, Evidence, Investigation, MediaArtifact, NormalizedItem, Provenance, Report
+from .schemas import (
+    AgentActivity,
+    Claim,
+    Entity,
+    Evidence,
+    Investigation,
+    MediaArtifact,
+    NormalizedItem,
+    Provenance,
+    Report,
+)
 
 
 class InvestigationRepository:

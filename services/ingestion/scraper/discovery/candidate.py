@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 
-
 DISCOVERY_SOURCES = {
     "brave_search",
     "rss",
@@ -142,7 +141,7 @@ class UrlCandidate:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "UrlCandidate":
+    def from_dict(cls, data: dict[str, Any]) -> UrlCandidate:
         return cls(
             url=data.get("url", ""),
             discovered_from=data.get("discovered_from", "manual"),

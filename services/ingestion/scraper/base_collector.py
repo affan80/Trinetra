@@ -1,6 +1,7 @@
 import abc
 from datetime import datetime
 
+
 class BaseCollector(abc.ABC):
     @abc.abstractmethod
     async def collect(self, source_url: str):

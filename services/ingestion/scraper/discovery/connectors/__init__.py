@@ -12,12 +12,12 @@ from services.scraper.discovery.connectors.sitemap import SitemapConnector
 from services.scraper.discovery.connectors.youtube import YouTubeConnector
 
 __all__ = [
-    "ConnectorError",
-    "ConnectorResult",
-    "HttpDiscoveryConnector",
     "BraveSearchConnector",
     "CommonCrawlConnector",
+    "ConnectorError",
+    "ConnectorResult",
     "GdeltConnector",
+    "HttpDiscoveryConnector",
     "RedditConnector",
     "RssConnector",
     "SitemapConnector",

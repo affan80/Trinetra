@@ -1,8 +1,10 @@
 import feedparser
 import httpx
 import trafilatura
+
 from .base_collector import BaseCollector
 from .registry import SourceType
+
 
 class NewsCollector(BaseCollector):
     def __init__(self):

@@ -1,7 +1,9 @@
+from datetime import datetime
+from typing import Any
+
 import httpx
 import trafilatura
-from datetime import datetime
-from typing import Dict, Any, Optional
+
 
 class WebCollectionService:
     """Unified service for web collection via Direct HTTP and Scrapy."""
@@ -10,7 +12,7 @@ class WebCollectionService:
         self.user_agent = user_agent
         self.client = httpx.AsyncClient(headers={"User-Agent": self.user_agent}, follow_redirects=True)
 
-    async def fetch_and_extract(self, url: str) -> Dict[str, Any]:
+    async def fetch_and_extract(self, url: str) -> dict[str, Any]:
         """Method 2: Direct HTTP fetching and extraction using trafilatura."""
         try:
             response = await self.client.get(url, timeout=30.0)
@@ -48,7 +50,6 @@ class WebCollectionService:
     def run_crawler(self, spider_name: str, start_urls: list):
         """Method 3: Trigger Scrapy crawling (Stub for future integration)."""
         # This would interface with the Scrapy CrawlerProcess
-        pass
 
     async def close(self):
         await self.client.aclose()

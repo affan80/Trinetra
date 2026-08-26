@@ -1,11 +1,12 @@
+from urllib.parse import urldefrag, urlparse
+
 import scrapy
-from urllib.parse import urlparse, urldefrag
 
 # Updated imports to use local package structure
 from services.common.items import NewsItem
-from services.scraper.surfaceweb.news_scraper import NewsScraper
 from services.scraper.fetchers import ScraplingFetchClient
 from services.scraper.policy import FetchPolicy
+from services.scraper.surfaceweb.news_scraper import NewsScraper
 
 
 class NewsSpider(scrapy.Spider):

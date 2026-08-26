@@ -1,5 +1,6 @@
 from dateutil import parser
 
+
 def parse_date(date_text):
     """
     Parses a date string into an ISO formatted string.

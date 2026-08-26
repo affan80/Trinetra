@@ -4,7 +4,6 @@ import os
 from urllib.parse import urlparse
 
 import scrapy
-
 from services.common.items import BlogItem, ImageItem, NewsItem
 from services.scraper.discovery import UrlCandidate
 from services.scraper.fetchers import ScraplingFetchClient

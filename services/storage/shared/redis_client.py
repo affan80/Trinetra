@@ -8,7 +8,6 @@ from functools import lru_cache
 import redis
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 

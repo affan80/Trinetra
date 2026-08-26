@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 from services.scraper.discovery import UrlCandidate
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 DEFAULT_REGISTRY_PATH = os.getenv(
     "SOURCE_REGISTRY_PATH",
     os.path.join(PROJECT_ROOT, "config", "scraper", "source_registry.json"),
@@ -40,6 +40,7 @@ class SourceRegistryEntry:
     country_tags: list[str] = field(default_factory=list)
     topic_tags: list[str] = field(default_factory=list)
     rss_urls: list[str] = field(default_factory=list)
+    listing_urls: list[str] = field(default_factory=list)
     sitemap_urls: list[str] = field(default_factory=list)
     discovery_queries: list[str] = field(default_factory=list)
     common_crawl_patterns: list[str] = field(default_factory=list)
@@ -129,11 +130,11 @@ class SourceRegistry:
         return candidate
 
     @classmethod
-    def from_dicts(cls, entries: list[dict]) -> "SourceRegistry":
+    def from_dicts(cls, entries: list[dict]) -> SourceRegistry:
         return cls([cls.validate_entry(SourceRegistryEntry(**entry)) for entry in entries])
 
     @classmethod
-    def from_file(cls, path: str | None = None) -> "SourceRegistry":
+    def from_file(cls, path: str | None = None) -> SourceRegistry:
         path = path or DEFAULT_REGISTRY_PATH
 
         with open(path, "r", encoding="utf-8") as file:

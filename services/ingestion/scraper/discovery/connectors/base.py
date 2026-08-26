@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import requests
-
 from services.scraper.discovery import UrlCandidate
 
 

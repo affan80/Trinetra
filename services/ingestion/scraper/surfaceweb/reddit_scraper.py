@@ -8,7 +8,6 @@ from typing import Any
 
 import requests
 
-
 DEFAULT_KEYWORDS = [
     "hack",
     "cyber",

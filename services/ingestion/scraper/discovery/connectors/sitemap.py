@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from lxml import etree
-
 from services.scraper.discovery import UrlCandidate
 from services.scraper.discovery.connectors.base import HttpDiscoveryConnector
 

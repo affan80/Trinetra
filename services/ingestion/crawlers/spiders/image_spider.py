@@ -1,9 +1,11 @@
+from urllib.parse import urldefrag, urlparse
+
 import scrapy
-from urllib.parse import urlparse, urldefrag
 from services.common.items import ImageItem
-from services.scraper.surfaceweb.image_scraper import ImageScraper
 from services.scraper.fetchers import ScraplingFetchClient
 from services.scraper.policy import FetchPolicy
+from services.scraper.surfaceweb.image_scraper import ImageScraper
+
 
 class ImageSpider(scrapy.Spider):
     name = "images"

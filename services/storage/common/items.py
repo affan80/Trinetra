@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, Field
+
 
 class SourceInfo(BaseModel):
     url: str
@@ -8,14 +10,14 @@ class SourceInfo(BaseModel):
     type: str
 
 class ContentInfo(BaseModel):
-    title: Optional[str] = None
-    text: Optional[str] = None
-    language: Optional[str] = None
+    title: str | None = None
+    text: str | None = None
+    language: str | None = None
 
 class Metadata(BaseModel):
-    author: Optional[str] = None
-    published_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    author: str | None = None
+    published_at: datetime | None = None
+    updated_at: datetime | None = None
     collected_at: datetime = Field(default_factory=datetime.utcnow)
     first_seen_at: datetime = Field(default_factory=datetime.utcnow)
     last_seen_at: datetime = Field(default_factory=datetime.utcnow)
@@ -25,8 +27,8 @@ class UnifiedDocument(BaseModel):
     source: SourceInfo
     content: ContentInfo
     metadata: Metadata
-    media: List[Dict[str, Any]] = []
-    entities: List[Dict[str, Any]] = []
-    locations: List[Dict[str, Any]] = []
-    events: List[Dict[str, Any]] = []
-    relationships: List[Dict[str, Any]] = []
+    media: list[dict[str, Any]] = []
+    entities: list[dict[str, Any]] = []
+    locations: list[dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
+    relationships: list[dict[str, Any]] = []

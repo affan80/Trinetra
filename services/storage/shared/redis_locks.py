@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Iterator
 
 import redis
-
 from services.shared.redis_client import get_redis_client
 
 

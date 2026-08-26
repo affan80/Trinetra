@@ -9,7 +9,6 @@ from services.shared.redis_dedupe import RedisDedupe
 from services.shared.redis_metrics import RedisMetrics
 from services.shared.redis_queue import RedisQueue
 
-
 FRONTIER_METRICS = {
     "discovered": "discovery_candidates",
     "enqueued": "frontier_enqueued",

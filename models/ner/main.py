@@ -2,7 +2,6 @@ from pathlib import Path
 
 from entity_extractor import EntityExtractor
 
-
 # Read OCR output
 ocr_output = (
     Path(__file__).parent.parent

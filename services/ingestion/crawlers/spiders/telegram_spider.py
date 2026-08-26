@@ -1,7 +1,7 @@
 import os
+
 import scrapy
 from dotenv import load_dotenv
-
 from services.common.items import NewsItem
 from services.scraper.surfaceweb.telegram_scraper import TelegramScraper
 

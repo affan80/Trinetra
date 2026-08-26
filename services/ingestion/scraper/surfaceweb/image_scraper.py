@@ -1,6 +1,8 @@
 from urllib.parse import urlparse
+
 from services.common.text_cleaner import clean_text
 from services.scraper.extractors.image_extractor import ImageExtractor
+
 
 class ImageScraper:
     def __init__(self, response):

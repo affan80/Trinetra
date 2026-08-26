@@ -4,7 +4,6 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from scrapy.http import HtmlResponse, Request
-
 from services.crawlers.spiders.frontier_spider import FrontierSpider
 from services.crawlers.spiders.image_spider import ImageSpider
 from services.parser.pipelines import OsintPipeline
@@ -20,7 +19,12 @@ from services.scraper.discovery.connectors import (
 )
 from services.scraper.extractors import ArticleExtractor, BlogExtractor
 from services.scraper.fetchers import ScraplingFetchClient
-from services.scraper.policy import FetchPolicy, SourcePolicy, SourceRegistry, SourceRegistryEntry
+from services.scraper.policy import (
+    FetchPolicy,
+    SourcePolicy,
+    SourceRegistry,
+    SourceRegistryEntry,
+)
 from services.scraper.surfaceweb.image_scraper import ImageScraper
 from services.shared.url_frontier import UrlFrontier
 

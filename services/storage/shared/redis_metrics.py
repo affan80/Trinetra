@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import redis
-
 from services.shared.redis_client import get_redis_client
 
 

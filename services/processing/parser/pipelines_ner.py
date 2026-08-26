@@ -1,5 +1,6 @@
-import spacy
 import logging
+
+import spacy
 from scrapy.exceptions import NotConfigured
 
 logger = logging.getLogger(__name__)

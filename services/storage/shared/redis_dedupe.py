@@ -6,7 +6,6 @@ import hashlib
 from urllib.parse import urlparse, urlunparse
 
 import redis
-
 from services.shared.redis_client import get_redis_client
 
 

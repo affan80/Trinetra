@@ -1,4 +1,3 @@
-import json
 
 from services.common.date_time import parse_date
 from services.common.text_cleaner import clean_text

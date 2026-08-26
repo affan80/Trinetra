@@ -2,8 +2,8 @@ import json
 import re
 from urllib.parse import urlparse
 
-from services.common.text_cleaner import clean_text
 from services.common.date_time import parse_date
+from services.common.text_cleaner import clean_text
 from services.scraper.extractors.blog_extractor import BlogExtractor
 
 
@@ -113,7 +113,7 @@ class BlogScraper:
             or ""
         )
 
-        author = re.sub(r"^by\s+", "", clean_text(author), flags=re.I)
+        author = re.sub(r"^by\s+", "", clean_text(author), flags=re.IGNORECASE)
         return clean_text(author)
 
     def get_json_ld_author(self):

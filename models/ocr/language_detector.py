@@ -1,5 +1,6 @@
 from langdetect import detect
 
+
 class LanguageDetector:
 
     def detect_language(self, text):

@@ -1,5 +1,6 @@
 from deep_translator import GoogleTranslator
 
+
 class Translator:
 
     def translate_to_english(self, text):

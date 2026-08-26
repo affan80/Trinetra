@@ -1,10 +1,9 @@
 import time
 from datetime import datetime, timedelta, timezone
 
-from telethon.sync import TelegramClient
-from telethon.errors import FloodWaitError, ChannelPrivateError, UsernameInvalidError
-
 from services.common.text_cleaner import clean_text
+from telethon.errors import ChannelPrivateError, FloodWaitError, UsernameInvalidError
+from telethon.sync import TelegramClient
 
 
 class TelegramScraper:

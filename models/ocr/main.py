@@ -1,7 +1,7 @@
-from ocr import OCRExtractor
-from language_detector import LanguageDetector
-from translator import Translator
 from entity_extractor import EntityExtractor
+from language_detector import LanguageDetector
+from ocr import OCRExtractor
+from translator import Translator
 
 ocr = OCRExtractor()
 detector = LanguageDetector()

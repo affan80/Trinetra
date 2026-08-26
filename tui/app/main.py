@@ -12,7 +12,16 @@ from urllib.request import Request, urlopen
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
-from textual.widgets import Button, Footer, Header, Input, Label, Select, Static, TextArea
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Input,
+    Label,
+    Select,
+    Static,
+    TextArea,
+)
 
 API_URL = os.getenv("TRINETRA_API_URL", "http://127.0.0.1:8000")
 
@@ -144,8 +153,8 @@ class AnalystWorkstation(App[None]):
                     f"MEDIA ANALYSIS — {row['filename']}\n\nType: {row['input_kind']}\nMIME: {row['mime_type']}\n"
                     f"SHA256: {row['sha256']}\nSize: {row['size_bytes']} bytes\nDimensions: {row.get('dimensions')}\n\n"
                     f"OBSERVATIONS\n" + "\n".join(f"• {item}" for item in row['observations']) +
-                    f"\n\nOBSERVED TEXT / IDENTIFIERS\n" + ("\n".join(row['entities']) or "No text-derived identifiers yet.") +
-                    f"\n\nSEARCH HYPOTHESES\n" + ("\n".join(row['search_hypotheses']) or "Configure OCR/ASR/vision adapters for more leads.")
+                    "\n\nOBSERVED TEXT / IDENTIFIERS\n" + ("\n".join(row['entities']) or "No text-derived identifiers yet.") +
+                    "\n\nSEARCH HYPOTHESES\n" + ("\n".join(row['search_hypotheses']) or "Configure OCR/ASR/vision adapters for more leads.")
                 )
         except Exception as exc:
             message = f"MEDIA ANALYSIS\n\n{exc}"
