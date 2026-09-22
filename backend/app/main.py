@@ -34,10 +34,28 @@ def require_roles(*roles):
 def audit(db, event, user, watchlist, old=None, new=None):
     db.add(AuditLog(event_type=event, user_id=user.id, watchlist_id=watchlist.id if watchlist else None, old_value=old, new_value=new)); db.commit()
 
-def find_watchlist(wid, db):
+def find_watchlist(wid, db, user=None):
     w = db.get(Watchlist, wid)
     if not w or w.status == WatchlistStatus.ARCHIVED: raise HTTPException(404, "Watchlist not found")
+    if user and user.role != Role.ADMIN and w.created_by != user.id: raise HTTPException(404, "Watchlist not found")
     return w
+
+def ensure_record_access(record, db, user):
+    if not record: raise HTTPException(404, "Record not found")
+    if record.watchlist_id: find_watchlist(record.watchlist_id, db, user)
+    elif user.role != Role.ADMIN: raise HTTPException(404, "Record not found")
+    return record
+
+def ensure_plan_access(plan, db, user):
+    if not plan: raise HTTPException(404, "Collection plan not found")
+    profile = db.get(MonitoringProfile, plan.profile_id)
+    if not profile: raise HTTPException(404, "Collection plan not found")
+    find_watchlist(profile.watchlist_id, db, user)
+    return plan
+
+def visible_record(record_id, db, user):
+    try: ensure_record_access(db.scalar(select(CanonicalRecord).where(CanonicalRecord.record_id == record_id)), db, user); return True
+    except HTTPException: return False
 
 def serialize_watchlist(w, db):
     entities = [db.get(Entity, x.entity_id) for x in w.entities]
@@ -86,15 +104,17 @@ def create_watchlist(data: WatchlistIn, db: Session = Depends(get_db), user=Depe
 
 @app.get(settings.api_v1_prefix + "/watchlists")
 def list_watchlists(db: Session = Depends(get_db), user=Depends(current_user)):
-    return [{"id": str(w.id), "name": w.name, "status": w.status.value, "priority": w.priority.value, "updated_at": w.updated_at} for w in db.scalars(select(Watchlist).where(Watchlist.status != WatchlistStatus.ARCHIVED)).all()]
+    query = select(Watchlist).where(Watchlist.status != WatchlistStatus.ARCHIVED)
+    if user.role != Role.ADMIN: query = query.where(Watchlist.created_by == user.id)
+    return [{"id": str(w.id), "name": w.name, "status": w.status.value, "priority": w.priority.value, "updated_at": w.updated_at} for w in db.scalars(query.limit(100)).all()]
 
 @app.get(settings.api_v1_prefix + "/watchlists/{wid}")
 def get_watchlist(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(current_user)):
-    w = find_watchlist(wid, db); return {"id": str(w.id), **serialize_watchlist(w, db), "status": w.status.value, "created_at": w.created_at, "updated_at": w.updated_at}
+    w = find_watchlist(wid, db, user); return {"id": str(w.id), **serialize_watchlist(w, db), "status": w.status.value, "created_at": w.created_at, "updated_at": w.updated_at}
 
 @app.patch(settings.api_v1_prefix + "/watchlists/{wid}")
 def update_watchlist(wid: uuid.UUID, data: WatchlistPatch, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
-    w = find_watchlist(wid, db)
+    w = find_watchlist(wid, db, user)
     if w.status in {WatchlistStatus.ACTIVE, WatchlistStatus.PAUSED}: w.status = WatchlistStatus.DRAFT
     w.name, w.description, w.objective, w.priority = data.name, data.description, data.objective, data.priority; write_children(w, data, db); db.commit(); db.refresh(w); audit(db, "WATCHLIST_UPDATED", user, w); return {"id": str(w.id), **serialize_watchlist(w, db), "status": w.status.value}
 
@@ -104,7 +124,7 @@ def transition(w, target):
     w.status = target
 
 def lifecycle(wid, target, event, db, user):
-    w = find_watchlist(wid, db); transition(w, target); db.commit(); audit(db, event, user, w); return {"id": str(w.id), "status": w.status.value}
+    w = find_watchlist(wid, db, user); transition(w, target); db.commit(); audit(db, event, user, w); return {"id": str(w.id), "status": w.status.value}
 
 @app.post(settings.api_v1_prefix + "/watchlists/{wid}/validate")
 def validate(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))): return lifecycle(wid, WatchlistStatus.VALIDATED, "WATCHLIST_VALIDATED", db, user)
@@ -117,37 +137,69 @@ def archive(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_
 
 @app.get(settings.api_v1_prefix + "/watchlists/{wid}/preview-queries")
 def preview_queries(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(current_user)):
-    w = find_watchlist(wid, db); return {"queries": expand(parse_watchlist(serialize_watchlist(w, db)))}
+    w = find_watchlist(wid, db, user); return {"queries": expand(parse_watchlist(serialize_watchlist(w, db)))}
 
 @app.post(settings.api_v1_prefix + "/watchlists/{wid}/compile")
 def compile_profile(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
-    w = find_watchlist(wid, db)
+    w = find_watchlist(wid, db, user)
     if w.status not in {WatchlistStatus.VALIDATED, WatchlistStatus.ACTIVE}: raise HTTPException(409, "Watchlist must be validated before compilation")
     requirement = parse_watchlist(serialize_watchlist(w, db)); queries = expand(requirement); previous = db.scalar(select(MonitoringProfile).where(MonitoringProfile.watchlist_id == w.id).order_by(MonitoringProfile.version.desc())); version = previous.version + 1 if previous else 1
     payload = build(w, requirement, queries, version); profile = MonitoringProfile(watchlist_id=w.id, version=version, status="ACTIVE", payload=payload); db.add(profile); db.flush(); payload["profile_id"] = str(profile.id); db.execute(update(MonitoringProfile).where(MonitoringProfile.id == profile.id).values(payload=payload)); db.add_all([GeneratedQuery(profile_id=profile.id, query=q["query"], language=q["language"], method=q["method"], generated_from=q["generated_from"]) for q in queries]); db.commit(); audit(db, "WATCHLIST_COMPILED", user, w, new={"version": version}); return payload
 
 @app.get(settings.api_v1_prefix + "/watchlists/{wid}/monitoring-profile")
 def monitoring_profile(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(current_user)):
-    w = find_watchlist(wid, db); p = db.scalar(select(MonitoringProfile).where(MonitoringProfile.watchlist_id == w.id).order_by(MonitoringProfile.version.desc()))
+    w = find_watchlist(wid, db, user); p = db.scalar(select(MonitoringProfile).where(MonitoringProfile.watchlist_id == w.id).order_by(MonitoringProfile.version.desc()))
     if not p: raise HTTPException(404, "No compiled profile")
     return p.payload
 
 @app.get(settings.api_v1_prefix + "/watchlists/{wid}/audit")
 def audit_history(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(current_user)):
-    find_watchlist(wid, db); return [{"event_type": x.event_type, "timestamp": x.timestamp, "old_value": x.old_value, "new_value": x.new_value} for x in db.scalars(select(AuditLog).where(AuditLog.watchlist_id == wid).order_by(AuditLog.timestamp.desc())).all()]
+    find_watchlist(wid, db, user); return [{"event_type": x.event_type, "timestamp": x.timestamp, "old_value": x.old_value, "new_value": x.new_value} for x in db.scalars(select(AuditLog).where(AuditLog.watchlist_id == wid).order_by(AuditLog.timestamp.desc()).limit(100)).all()]
 from backend.app.layer2_schemas import PlanCreate, SourceCreate, WorkerHeartbeat
 from backend.app.security import validate_source_config
-from backend.app.services.collection_planner import build as build_collection_plan
 from backend.app.services.dispatch_service import dispatch
+from backend.app.workers.dispatch_tasks import dispatch_collection_job
 from backend.app.services.job_generator import generate
 from backend.app.services.scheduler_service import schedule
 from backend.app.services.source_health_service import record as record_source_health
-from backend.app.workers.dispatch_tasks import dispatch_collection_job
 from backend.app.services.adapter_registry import ADAPTERS
 from backend.app.collectors.adapters.rss import collect as collect_rss
 from backend.app.services.checkpoint_service import get as get_checkpoint, save as save_checkpoint
 from backend.app.services.evidence_service import preserve
 from backend.app.services.object_store import ObjectStore
+from backend.app.dedup.services.dedup_pipeline import process as process_dedup
+
+@app.post(settings.api_v1_prefix + "/records/{record_id}/deduplicate")
+def deduplicate_record(record_id: str, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
+    try: return process_dedup(db, record_id, user.id)
+    except ValueError as exc: raise HTTPException(404, str(exc))
+
+@app.get(settings.api_v1_prefix + "/records/{record_id}/quality")
+def record_quality(record_id: str, db: Session = Depends(get_db), user=Depends(current_user)):
+    ensure_record_access(db.scalar(select(CanonicalRecord).where(CanonicalRecord.record_id == record_id)), db, user); row = db.scalar(select(RecordQuality).where(RecordQuality.record_id == record_id))
+    if not row: raise HTTPException(404, "Quality annotation not found")
+    return {"record_id": record_id, "status": row.status.value, "score": row.quality_score, "version": row.quality_version, "components": row.components, "flags": row.flags}
+
+@app.get(settings.api_v1_prefix + "/records/{record_id}/duplicates")
+def record_duplicates(record_id: str, limit: int = 100, offset: int = 0, db: Session = Depends(get_db), user=Depends(current_user)):
+    ensure_record_access(db.scalar(select(CanonicalRecord).where(CanonicalRecord.record_id == record_id)), db, user); limit = max(1, min(limit, 100)); members = db.scalars(select(DuplicateClusterMember).where(DuplicateClusterMember.record_id == record_id).offset(offset).limit(limit)).all()
+    return [{"cluster_id": str(member.cluster_id), "record_id": member.record_id, "relationship": member.relationship_type, "score": member.similarity_score, "method": member.detection_method} for member in members]
+
+@app.get(settings.api_v1_prefix + "/records/{record_id}/similarities")
+def record_similarities(record_id: str, limit: int = 100, offset: int = 0, db: Session = Depends(get_db), user=Depends(current_user)):
+    ensure_record_access(db.scalar(select(CanonicalRecord).where(CanonicalRecord.record_id == record_id)), db, user); limit = max(1, min(limit, 100)); rows = db.scalars(select(RecordSimilarity).where(or_(RecordSimilarity.record_a_id == record_id, RecordSimilarity.record_b_id == record_id)).offset(offset).limit(limit)).all()
+    return [{"record_a_id": row.record_a_id, "record_b_id": row.record_b_id, "type": row.similarity_type, "score": row.similarity_score, "signals": row.signals, "decision": row.decision, "version": row.decision_version} for row in rows if visible_record(row.record_a_id, db, user) and visible_record(row.record_b_id, db, user)]
+
+@app.get(settings.api_v1_prefix + "/duplicate-clusters/{cluster_id}/members")
+def cluster_members(cluster_id: uuid.UUID, limit: int = 100, offset: int = 0, db: Session = Depends(get_db), user=Depends(current_user)):
+    limit = max(1, min(limit, 100)); cluster = db.get(DuplicateCluster, cluster_id)
+    if not cluster: raise HTTPException(404, "Duplicate cluster not found")
+    rows = db.scalars(select(DuplicateClusterMember).where(DuplicateClusterMember.cluster_id == cluster_id).offset(offset).limit(limit)).all()
+    visible = [row for row in rows if visible_record(row.record_id, db, user)]
+    if not visible and user.role != Role.ADMIN: raise HTTPException(404, "Duplicate cluster not found")
+    representative = cluster.representative_record_id if visible_record(cluster.representative_record_id, db, user) else visible[0].record_id
+    return {"cluster_id": str(cluster.id), "representative_record_id": representative, "member_count": len(visible) if user.role != Role.ADMIN else cluster.member_count, "members": [{"record_id": row.record_id, "relationship": row.relationship_type, "score": row.similarity_score, "explanation": row.explanation} for row in visible]}
+
 
 @app.post(settings.api_v1_prefix + "/sources")
 def create_source(data: SourceCreate, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN"))):
@@ -160,7 +212,7 @@ def create_source(data: SourceCreate, db: Session = Depends(get_db), user=Depend
 
 @app.get(settings.api_v1_prefix + "/sources")
 def list_sources(db: Session = Depends(get_db), user=Depends(current_user)):
-    return [{"id": str(s.id), "name": s.name, "source_class": s.source_class, "adapter_name": s.adapter_name, "enabled": s.enabled, "rate_limit_per_minute": s.rate_limit_per_minute} for s in db.scalars(select(Source)).all()]
+    return [{"id": str(s.id), "name": s.name, "source_class": s.source_class, "adapter_name": s.adapter_name, "enabled": s.enabled, "rate_limit_per_minute": s.rate_limit_per_minute} for s in db.scalars(select(Source).limit(100)).all()]
 
 @app.get(settings.api_v1_prefix + "/collectors")
 def collectors(user=Depends(current_user)): return {"adapters": list(ADAPTERS)}
@@ -183,6 +235,7 @@ def create_collection_plans(data: PlanCreate, db: Session = Depends(get_db), use
     
     profile = db.get(MonitoringProfile, profile_id)
     if not profile or profile.status != "ACTIVE": raise HTTPException(404, "Active monitoring profile not found")
+    find_watchlist(profile.watchlist_id, db, user)
     
     sources = [db.get(Source, s_id) for s_id in source_ids]
     if any(s is None or not s.enabled for s in sources): raise HTTPException(422, "All sources must exist and be enabled")
@@ -199,16 +252,23 @@ def create_collection_plans(data: PlanCreate, db: Session = Depends(get_db), use
 
 @app.get(settings.api_v1_prefix + "/collection-plans")
 def list_collection_plans(db: Session = Depends(get_db), user=Depends(current_user)):
-    return [{"id": str(p.id), "profile_id": str(p.profile_id), "source_id": str(p.source_id), "status": p.status, "policy": p.policy} for p in db.scalars(select(CollectionPlan)).all()]
+    plans = db.scalars(select(CollectionPlan).limit(100)).all()
+    return [{"id": str(p.id), "profile_id": str(p.profile_id), "source_id": str(p.source_id), "status": p.status, "policy": p.policy} for p in plans if user.role == Role.ADMIN or not _plan_hidden(p, db, user)]
 
 @app.get(settings.api_v1_prefix + "/collection-jobs")
 def list_collection_jobs(db: Session = Depends(get_db), user=Depends(current_user)):
-    return [{"id": str(j.id), "plan_id": str(j.plan_id), "source_id": str(j.source_id), "query": j.query, "language": j.language, "fingerprint": j.fingerprint, "status": j.status, "attempts": j.attempts} for j in db.scalars(select(CollectionJob).order_by(CollectionJob.created_at.desc())).all()]
+    jobs = db.scalars(select(CollectionJob).order_by(CollectionJob.created_at.desc()).limit(100)).all()
+    return [{"id": str(j.id), "plan_id": str(j.plan_id), "source_id": str(j.source_id), "query": j.query, "language": j.language, "fingerprint": j.fingerprint, "status": j.status, "attempts": j.attempts} for j in jobs if user.role == Role.ADMIN or not _plan_hidden(db.get(CollectionPlan, j.plan_id), db, user)]
+
+def _plan_hidden(plan, db, user):
+    try: ensure_plan_access(plan, db, user); return False
+    except HTTPException: return True
 
 @app.post(settings.api_v1_prefix + "/collection-jobs/{job_id}/dispatch")
 def dispatch_job(job_id: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
     job = db.get(CollectionJob, job_id)
     if not job: raise HTTPException(404, "Collection job not found")
+    ensure_plan_access(db.get(CollectionPlan, job.plan_id), db, user)
     if job.status not in {"QUEUED", "RETRY"}: raise HTTPException(409, "Job is not dispatchable")
     payload = dispatch(job); job.status = "DISPATCHED"; job.dispatched_at = now(); job.attempts += 1; db.commit()
     return {"job_id": str(job.id), "status": "DISPATCHED", "payload": payload}
@@ -217,6 +277,7 @@ def dispatch_job(job_id: uuid.UUID, db: Session = Depends(get_db), user=Depends(
 def celery_dispatch(job_id: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
     job = db.get(CollectionJob, job_id)
     if not job: raise HTTPException(404, "Collection job not found")
+    ensure_plan_access(db.get(CollectionPlan, job.plan_id), db, user)
     task = dispatch_collection_job.delay(str(job.id))
     return {"job_id": str(job.id), "task_id": task.id, "status": "QUEUED_FOR_WORKER"}
 
@@ -230,6 +291,7 @@ def source_health(source_id: uuid.UUID, ok: bool = True, error: str | None = Non
 def collect_rss_job(job_id: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
     job = db.get(CollectionJob, job_id); source = db.get(Source, job.source_id) if job else None
     if not job or not source: raise HTTPException(404, "Collection job or source not found")
+    ensure_plan_access(db.get(CollectionPlan, job.plan_id), db, user)
     feed_url = job.payload.get("feed_url") or source.config.get("rss_url")
     if not feed_url: raise HTTPException(422, "No trusted RSS URL is configured for this source")
     try:

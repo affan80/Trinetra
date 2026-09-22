@@ -10,7 +10,7 @@ def tick():
     db = SessionLocal()
     try:
         now = datetime.now(timezone.utc)
-        for schedule in db.scalars(select(CollectionSchedule).where(CollectionSchedule.enabled.is_(True), CollectionSchedule.next_run_at <= now)).all():
+        for schedule in db.scalars(select(CollectionSchedule).where(CollectionSchedule.enabled.is_(True), CollectionSchedule.next_run_at <= now).limit(100)).all():
             plan = db.get(CollectionPlan, schedule.plan_id); profile = db.get(MonitoringProfile, plan.profile_id) if plan else None
             if plan and profile and profile.status == "ACTIVE": generate(db, plan, profile.payload, limit=plan.policy.get("max_jobs_per_run", 100))
             schedule.next_run_at = next_run(schedule.interval_seconds)

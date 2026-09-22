@@ -189,6 +189,106 @@ class CollectorWorker(Base):
     last_heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class CanonicalRecord(Base):
+    __tablename__ = "canonical_records"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    record_id: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    evidence_id: Mapped[str] = mapped_column(String(80))
+    source_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("sources.id"))
+    watchlist_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("watchlists.id"))
+    record_type: Mapped[str] = mapped_column(String(40))
+    canonical_url: Mapped[str | None] = mapped_column(Text)
+    title: Mapped[str] = mapped_column(Text, default="")
+    plain_text: Mapped[str] = mapped_column(Text, default="")
+    primary_language: Mapped[str | None] = mapped_column(String(12))
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    retrieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    sha256: Mapped[str | None] = mapped_column(String(64), index=True)
+    processing_quality: Mapped[dict] = mapped_column(JSON, default=dict)
+    content_blocks: Mapped[list] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class QualityStatus(str, enum.Enum): VALID="VALID"; LOW_CONTENT="LOW_CONTENT"; EMPTY="EMPTY"; BOILERPLATE="BOILERPLATE"; ERROR_PAGE="ERROR_PAGE"; CAPTCHA="CAPTCHA"; LOGIN_REQUIRED="LOGIN_REQUIRED"; CORRUPT="CORRUPT"; PARTIAL="PARTIAL"; UNSUPPORTED="UNSUPPORTED"
+class DuplicateType(str, enum.Enum): EXACT_RAW="EXACT_RAW"; EXACT_TEXT="EXACT_TEXT"; CANONICAL_URL="CANONICAL_URL"; DOCUMENT_VERSION="DOCUMENT_VERSION"; POSSIBLE_DUPLICATE="POSSIBLE_DUPLICATE"; RELATED_NOT_DUPLICATE="RELATED_NOT_DUPLICATE"
+class ClusterStatus(str, enum.Enum): ACTIVE="ACTIVE"; MERGED="MERGED"; SPLIT="SPLIT"
+
+
+class RecordQuality(Base):
+    __tablename__ = "record_quality"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    record_id: Mapped[str] = mapped_column(ForeignKey("canonical_records.record_id"), unique=True)
+    status: Mapped[QualityStatus] = mapped_column(Enum(QualityStatus))
+    quality_score: Mapped[float] = mapped_column(Float)
+    quality_version: Mapped[str] = mapped_column(String(40))
+    components: Mapped[dict] = mapped_column(JSON, default=dict)
+    flags: Mapped[list] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class RecordFingerprint(Base):
+    __tablename__ = "record_fingerprints"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    record_id: Mapped[str] = mapped_column(ForeignKey("canonical_records.record_id"), unique=True, index=True)
+    raw_sha256: Mapped[str | None] = mapped_column(String(64), index=True)
+    normalized_text_hash: Mapped[str] = mapped_column(String(64), index=True)
+    language: Mapped[str | None] = mapped_column(String(12))
+    fingerprint_version: Mapped[str] = mapped_column(String(40))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class DuplicateCluster(Base):
+    __tablename__ = "duplicate_clusters"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    cluster_type: Mapped[str] = mapped_column(String(40))
+    representative_record_id: Mapped[str] = mapped_column(ForeignKey("canonical_records.record_id"))
+    member_count: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[ClusterStatus] = mapped_column(Enum(ClusterStatus), default=ClusterStatus.ACTIVE)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    explanation: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class DuplicateClusterMember(Base):
+    __tablename__ = "duplicate_cluster_members"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    cluster_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("duplicate_clusters.id"))
+    record_id: Mapped[str] = mapped_column(ForeignKey("canonical_records.record_id"))
+    relationship_type: Mapped[str] = mapped_column(String(40))
+    similarity_score: Mapped[float] = mapped_column(Float, default=1.0)
+    detection_method: Mapped[str] = mapped_column(String(60))
+    decision_version: Mapped[str] = mapped_column(String(40))
+    explanation: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    __table_args__ = (UniqueConstraint("cluster_id", "record_id"),)
+
+
+class RecordSimilarity(Base):
+    __tablename__ = "record_similarities"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    record_a_id: Mapped[str] = mapped_column(ForeignKey("canonical_records.record_id"))
+    record_b_id: Mapped[str] = mapped_column(ForeignKey("canonical_records.record_id"))
+    similarity_type: Mapped[str] = mapped_column(String(40))
+    similarity_score: Mapped[float] = mapped_column(Float)
+    signals: Mapped[dict] = mapped_column(JSON, default=dict)
+    decision: Mapped[str] = mapped_column(String(40))
+    decision_version: Mapped[str] = mapped_column(String(40))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    __table_args__ = (UniqueConstraint("record_a_id", "record_b_id", "decision_version"),)
+
+
+class DuplicateOverride(Base):
+    __tablename__ = "duplicate_overrides"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    record_a_id: Mapped[str] = mapped_column(ForeignKey("canonical_records.record_id"))
+    record_b_id: Mapped[str] = mapped_column(ForeignKey("canonical_records.record_id"))
+    override_type: Mapped[str] = mapped_column(String(40))
+    reason: Mapped[str] = mapped_column(Text)
+    created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
 class RawObject(Base):
     __tablename__ = "raw_objects"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)

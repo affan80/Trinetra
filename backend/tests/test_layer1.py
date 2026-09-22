@@ -1,6 +1,6 @@
 import os
 import uuid
-os.environ["DATABASE_URL"] = "sqlite:///./test_layer1.db"
+os.environ["DATABASE_URL"] = "sqlite:////tmp/trinetra-layer1-test.db"
 from fastapi.testclient import TestClient
 from backend.app.main import app
 

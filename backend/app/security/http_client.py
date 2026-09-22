@@ -18,12 +18,16 @@ def fetch(url: str, allowed_domains: list[str], *, headers: dict | None = None, 
     with httpx.Client(follow_redirects=False, timeout=timeout, verify=True, headers={"User-Agent": "TRINETRA-OSINT-Collector/0.1", **(headers or {})}) as client:
         for _ in range(MAX_REDIRECTS + 1):
             resolve_public(current, allowed_domains)
-            response = client.get(current, follow_redirects=False)
-            if response.is_redirect:
-                chain.append(current); current = urljoin(current, response.headers.get("location", "")); continue
-            body = response.content
-            if len(body) > max_bytes: raise ValueError("response exceeds configured size limit")
-            return FetchResult(url, str(response.url), response.status_code, response.headers.get("content-type", "").split(";", 1)[0].lower(), sanitized_headers(response.headers), body, chain)
+            with client.stream("GET", current, follow_redirects=False) as response:
+                if response.is_redirect:
+                    chain.append(current); current = urljoin(current, response.headers.get("location", "")); continue
+                chunks = []; total = 0
+                for chunk in response.iter_bytes():
+                    total += len(chunk)
+                    if total > max_bytes: raise ValueError("response exceeds configured size limit")
+                    chunks.append(chunk)
+                body = b"".join(chunks)
+                return FetchResult(url, str(response.url), response.status_code, response.headers.get("content-type", "").split(";", 1)[0].lower(), sanitized_headers(response.headers), body, chain)
     raise ValueError("redirect limit exceeded")
 
 def sha256(data: bytes) -> str: return hashlib.sha256(data).hexdigest()
