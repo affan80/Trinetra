@@ -1,8 +1,23 @@
 # Trinetra
 
+<<<<<<< HEAD
 Trinetra is a containerized OSINT investigation platform. The default V1 stack
 provides the API, Redis, and the analyst TUI. The legacy pipeline additionally
 starts Kafka, Spark, crawler, worker, PostGIS, Neo4j, and MinIO.
+=======
+## Layer 1 watchlist control
+
+The current Docker stack runs only PostgreSQL, the FastAPI Layer 1 backend, and the Next.js frontend. It creates validated, deterministic, versioned monitoring profiles; it does not collect OSINT data.
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Register an analyst at `POST /api/v1/auth/register`, then use the bearer token with the watchlist endpoints under `/api/v1`.
+
+Trinetra is an India-focused AI platform built for the **Indian Air Force**. It takes scattered public data—news, social media, images, and videos—and turns it into clear, verified, and linked intelligence.
+>>>>>>> dacd510 (build mission and Setup containerized development)
 
 ## Choose a stack
 

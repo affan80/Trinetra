@@ -1,0 +1,2 @@
+import { FormEvent, useState } from "react";
+export default function NewWatchlist() { const [name, setName] = useState(""); const [message, setMessage] = useState(""); function submit(e: FormEvent) { e.preventDefault(); setMessage(`Draft ready: ${name}`); } return <main><h1>New watchlist</h1><form onSubmit={submit}><label>Name <input value={name} onChange={e => setName(e.target.value)} required /></label><button>Save draft</button></form><p>{message}</p></main>; }
