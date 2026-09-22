@@ -1,0 +1,2 @@
+import { useEffect, useState } from "react";
+export default function Collection() { const [jobs, setJobs] = useState<unknown[]>([]); useEffect(() => { const token = localStorage.getItem("trinetra_token"); if (token) fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/collection-jobs`, {headers: {Authorization: `Bearer ${token}`}}).then(r => r.json()).then(setJobs); }, []); return <main><h1>Collection control</h1><p>Layer 2 jobs ready for Layer 3 collectors: {jobs.length}</p><pre>{JSON.stringify(jobs, null, 2)}</pre></main>; }

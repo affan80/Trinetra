@@ -86,3 +86,158 @@ class GeneratedQuery(Base):
 class AuditLog(Base):
     __tablename__ = "audit_logs"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid); event_type: Mapped[str] = mapped_column(String(80)); user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id")); watchlist_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("watchlists.id")); timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now); old_value: Mapped[dict | None] = mapped_column(JSON); new_value: Mapped[dict | None] = mapped_column(JSON); metadata_json: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class Source(Base):
+    __tablename__ = "sources"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(200), unique=True)
+    source_class: Mapped[str] = mapped_column(String(40))
+    adapter_name: Mapped[str] = mapped_column(String(100))
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    allowed_domains: Mapped[list] = mapped_column(JSON, default=list)
+    config: Mapped[dict] = mapped_column(JSON, default=dict)
+    rate_limit_per_minute: Mapped[int] = mapped_column(Integer, default=30)
+    cooldown_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class CollectionPlan(Base):
+    __tablename__ = "collection_plans"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    profile_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("monitoring_profiles.id"))
+    source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sources.id"))
+    status: Mapped[str] = mapped_column(String(30), default="READY")
+    policy: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class CollectionSchedule(Base):
+    __tablename__ = "collection_schedules"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    plan_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("collection_plans.id"), unique=True)
+    interval_seconds: Mapped[int] = mapped_column(Integer)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    next_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class CollectionJob(Base):
+    __tablename__ = "collection_jobs"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    plan_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("collection_plans.id"))
+    profile_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("monitoring_profiles.id"))
+    source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sources.id"))
+    fingerprint: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    query: Mapped[str] = mapped_column(Text)
+    language: Mapped[str] = mapped_column(String(10))
+    status: Mapped[str] = mapped_column(String(30), default="QUEUED")
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    payload: Mapped[dict] = mapped_column(JSON, default=dict)
+    scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class CollectionAttempt(Base):
+    __tablename__ = "collection_attempts"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    job_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("collection_jobs.id"))
+    attempt_number: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(30))
+    error_code: Mapped[str | None] = mapped_column(String(80))
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class SourceCheckpoint(Base):
+    __tablename__ = "source_checkpoints"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sources.id"), unique=True)
+    cursor: Mapped[dict] = mapped_column(JSON, default=dict)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class SourceHealth(Base):
+    __tablename__ = "source_health"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sources.id"), unique=True)
+    state: Mapped[str] = mapped_column(String(30), default="HEALTHY")
+    consecutive_failures: Mapped[int] = mapped_column(Integer, default=0)
+    last_error: Mapped[str | None] = mapped_column(Text)
+    last_checked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class CollectionPolicy(Base):
+    __tablename__ = "collection_policies"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(100), unique=True)
+    max_attempts: Mapped[int] = mapped_column(Integer, default=3)
+    backoff_seconds: Mapped[int] = mapped_column(Integer, default=60)
+    max_jobs_per_run: Mapped[int] = mapped_column(Integer, default=100)
+    config: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class CollectorWorker(Base):
+    __tablename__ = "collector_workers"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    worker_name: Mapped[str] = mapped_column(String(150), unique=True)
+    adapter_names: Mapped[list] = mapped_column(JSON, default=list)
+    status: Mapped[str] = mapped_column(String(30), default="UNKNOWN")
+    last_heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class RawObject(Base):
+    __tablename__ = "raw_objects"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    evidence_id: Mapped[str] = mapped_column(String(40), unique=True)
+    job_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("collection_jobs.id"))
+    source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sources.id"))
+    watchlist_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("watchlists.id"))
+    profile_version: Mapped[int | None] = mapped_column(Integer)
+    source_url: Mapped[str] = mapped_column(Text)
+    final_url: Mapped[str] = mapped_column(Text)
+    adapter_type: Mapped[str] = mapped_column(String(40))
+    object_uri: Mapped[str] = mapped_column(Text)
+    sha256: Mapped[str] = mapped_column(String(64), index=True)
+    content_type: Mapped[str] = mapped_column(String(150))
+    content_length: Mapped[int] = mapped_column(Integer)
+    http_status: Mapped[int] = mapped_column(Integer)
+    etag: Mapped[str | None] = mapped_column(String(255))
+    last_modified: Mapped[str | None] = mapped_column(String(255))
+    retrieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    malware_status: Mapped[str] = mapped_column(String(30), default="NOT_SCANNED")
+    collector_version: Mapped[str] = mapped_column(String(40))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class CollectionProvenance(Base):
+    __tablename__ = "collection_provenance"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    raw_object_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("raw_objects.id"))
+    job_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("collection_jobs.id"))
+    source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sources.id"))
+    collector_id: Mapped[str] = mapped_column(String(100))
+    collector_version: Mapped[str] = mapped_column(String(40))
+    adapter_type: Mapped[str] = mapped_column(String(40))
+    requested_url: Mapped[str] = mapped_column(Text)
+    final_url: Mapped[str] = mapped_column(Text)
+    redirect_chain: Mapped[list] = mapped_column(JSON, default=list)
+    observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    http_headers_sanitized: Mapped[dict] = mapped_column(JSON, default=dict)
+    collection_method: Mapped[str] = mapped_column(String(40))
+    checkpoint_before: Mapped[dict] = mapped_column(JSON, default=dict)
+    checkpoint_after: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class RobotsCache(Base):
+    __tablename__ = "robots_cache"
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uid)
+    source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sources.id"), unique=True)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    allowed: Mapped[bool] = mapped_column(Boolean)
+    raw_hash: Mapped[str] = mapped_column(String(64))

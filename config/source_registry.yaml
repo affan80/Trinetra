@@ -1,0 +1,55 @@
+sources:
+- id: SRC-WWW-ALJAZEERA-COM
+  name: Al Jazeera
+  sector:
+  - NEWS
+  source_class: NEWS
+  base_url: https://www.aljazeera.com/
+  allowed_domains:
+  - www.aljazeera.com
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-WWW-CSIS-ORG
+  name: CSIS
+  sector:
+  - BLOG_ANALYSIS
+  source_class: BLOG
+  base_url: https://www.csis.org/
+  allowed_domains:
+  - www.csis.org
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BOOKS-TOSCRAPE-COM
+  name: Books To Scrape Test
+  sector:
+  - TEST
+  source_class: OTHER
+  base_url: https://books.toscrape.com/
+  allowed_domains:
+  - books.toscrape.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE

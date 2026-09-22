@@ -1,0 +1,7 @@
+import enum
+
+class Role(str, enum.Enum): ADMIN = "ADMIN"; ANALYST = "ANALYST"; VIEWER = "VIEWER"
+class Priority(str, enum.Enum): LOW = "LOW"; MEDIUM = "MEDIUM"; HIGH = "HIGH"; CRITICAL = "CRITICAL"
+class WatchlistStatus(str, enum.Enum): DRAFT = "DRAFT"; VALIDATED = "VALIDATED"; ACTIVE = "ACTIVE"; PAUSED = "PAUSED"; ERROR = "ERROR"; ARCHIVED = "ARCHIVED"
+class EntityType(str, enum.Enum): PERSON="PERSON"; ORGANISATION="ORGANISATION"; LOCATION="LOCATION"; ASSET="ASSET"; FACILITY="FACILITY"; SYSTEM="SYSTEM"; EVENT="EVENT"; OTHER="OTHER"
+class KeywordKind(str, enum.Enum): INCLUDE="INCLUDE"; EXCLUDE="EXCLUDE"

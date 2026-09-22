@@ -1,7 +1,7 @@
 import uuid
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from backend.app.core.config import settings
 from backend.app.core.security import bearer, create_access_token, decode_access_token, hash_password, verify_password
@@ -32,7 +32,7 @@ def require_roles(*roles):
     return dependency
 
 def audit(db, event, user, watchlist, old=None, new=None):
-    db.add(AuditLog(event_type=event, user_id=user.id, watchlist_id=watchlist.id, old_value=old, new_value=new)); db.commit()
+    db.add(AuditLog(event_type=event, user_id=user.id, watchlist_id=watchlist.id if watchlist else None, old_value=old, new_value=new)); db.commit()
 
 def find_watchlist(wid, db):
     w = db.get(Watchlist, wid)
@@ -63,7 +63,7 @@ def write_children(w, data, db):
     w.locations = []
     for item in data.locations:
         l = Location(**item.model_dump()); db.add(l); db.flush(); w.locations.append(WatchlistLocation(location_id=l.id))
-    w.refresh_interval_minutes = data.collection_policy["refresh_interval_minutes"]
+    w.refresh_interval_minutes = data.collection_policy.get("refresh_interval_minutes", 15)
 
 @app.get("/health")
 def health(): return {"status": "healthy"}
@@ -124,7 +124,7 @@ def compile_profile(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(
     w = find_watchlist(wid, db)
     if w.status not in {WatchlistStatus.VALIDATED, WatchlistStatus.ACTIVE}: raise HTTPException(409, "Watchlist must be validated before compilation")
     requirement = parse_watchlist(serialize_watchlist(w, db)); queries = expand(requirement); previous = db.scalar(select(MonitoringProfile).where(MonitoringProfile.watchlist_id == w.id).order_by(MonitoringProfile.version.desc())); version = previous.version + 1 if previous else 1
-    payload = build(w, requirement, queries, version); profile = MonitoringProfile(watchlist_id=w.id, version=version, status="ACTIVE", payload=payload); db.add(profile); db.flush(); db.add_all([GeneratedQuery(profile_id=profile.id, query=q["query"], language=q["language"], method=q["method"], generated_from=q["generated_from"]) for q in queries]); db.commit(); audit(db, "WATCHLIST_COMPILED", user, w, new={"version": version}); return payload
+    payload = build(w, requirement, queries, version); profile = MonitoringProfile(watchlist_id=w.id, version=version, status="ACTIVE", payload=payload); db.add(profile); db.flush(); payload["profile_id"] = str(profile.id); db.execute(update(MonitoringProfile).where(MonitoringProfile.id == profile.id).values(payload=payload)); db.add_all([GeneratedQuery(profile_id=profile.id, query=q["query"], language=q["language"], method=q["method"], generated_from=q["generated_from"]) for q in queries]); db.commit(); audit(db, "WATCHLIST_COMPILED", user, w, new={"version": version}); return payload
 
 @app.get(settings.api_v1_prefix + "/watchlists/{wid}/monitoring-profile")
 def monitoring_profile(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(current_user)):
@@ -135,3 +135,107 @@ def monitoring_profile(wid: uuid.UUID, db: Session = Depends(get_db), user=Depen
 @app.get(settings.api_v1_prefix + "/watchlists/{wid}/audit")
 def audit_history(wid: uuid.UUID, db: Session = Depends(get_db), user=Depends(current_user)):
     find_watchlist(wid, db); return [{"event_type": x.event_type, "timestamp": x.timestamp, "old_value": x.old_value, "new_value": x.new_value} for x in db.scalars(select(AuditLog).where(AuditLog.watchlist_id == wid).order_by(AuditLog.timestamp.desc())).all()]
+from backend.app.layer2_schemas import PlanCreate, SourceCreate, WorkerHeartbeat
+from backend.app.security import validate_source_config
+from backend.app.services.collection_planner import build as build_collection_plan
+from backend.app.services.dispatch_service import dispatch
+from backend.app.services.job_generator import generate
+from backend.app.services.scheduler_service import schedule
+from backend.app.services.source_health_service import record as record_source_health
+from backend.app.workers.dispatch_tasks import dispatch_collection_job
+from backend.app.services.adapter_registry import ADAPTERS
+from backend.app.collectors.adapters.rss import collect as collect_rss
+from backend.app.services.checkpoint_service import get as get_checkpoint, save as save_checkpoint
+from backend.app.services.evidence_service import preserve
+from backend.app.services.object_store import ObjectStore
+
+@app.post(settings.api_v1_prefix + "/sources")
+def create_source(data: SourceCreate, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN"))):
+    try: validate_source_config(data.allowed_domains, data.config)
+    except ValueError as exc: raise HTTPException(422, str(exc))
+    if db.scalar(select(Source).where(Source.name == data.name)): raise HTTPException(409, "Source already exists")
+    source = Source(**data.model_dump()); db.add(source); db.commit(); db.refresh(source)
+    audit(db, "SOURCE_CREATED", user, None, new={"source_id": str(source.id), "name": source.name})
+    return {"id": str(source.id), "name": source.name, "source_class": source.source_class, "adapter_name": source.adapter_name, "enabled": source.enabled}
+
+@app.get(settings.api_v1_prefix + "/sources")
+def list_sources(db: Session = Depends(get_db), user=Depends(current_user)):
+    return [{"id": str(s.id), "name": s.name, "source_class": s.source_class, "adapter_name": s.adapter_name, "enabled": s.enabled, "rate_limit_per_minute": s.rate_limit_per_minute} for s in db.scalars(select(Source)).all()]
+
+@app.get(settings.api_v1_prefix + "/collectors")
+def collectors(user=Depends(current_user)): return {"adapters": list(ADAPTERS)}
+
+@app.post(settings.api_v1_prefix + "/collectors/heartbeat")
+def heartbeat(data: WorkerHeartbeat, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
+    from datetime import datetime, timezone
+    worker = db.scalar(select(CollectorWorker).where(CollectorWorker.worker_name == data.worker_name))
+    if not worker: worker = CollectorWorker(worker_name=data.worker_name); db.add(worker)
+    worker.adapter_names = data.adapter_names; worker.status = "READY"; worker.last_heartbeat_at = datetime.now(timezone.utc); db.commit()
+    return {"worker_name": worker.worker_name, "status": worker.status}
+
+@app.post(settings.api_v1_prefix + "/collection-plans")
+def create_collection_plans(data: PlanCreate, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
+    try:
+        profile_id = uuid.UUID(data.profile_id)
+        source_ids = [uuid.UUID(s_id) for s_id in data.source_ids]
+    except ValueError:
+        raise HTTPException(422, "Invalid UUID format")
+    
+    profile = db.get(MonitoringProfile, profile_id)
+    if not profile or profile.status != "ACTIVE": raise HTTPException(404, "Active monitoring profile not found")
+    
+    sources = [db.get(Source, s_id) for s_id in source_ids]
+    if any(s is None or not s.enabled for s in sources): raise HTTPException(422, "All sources must exist and be enabled")
+    allowed = set(profile.payload.get("source_classes", []))
+    if any(s.source_class not in allowed for s in sources): raise HTTPException(422, "Source class is not present in the monitoring profile")
+    result = []
+    for source in sources:
+        plan = CollectionPlan(profile_id=profile.id, source_id=source.id, created_by=user.id, policy={"adapter_name": source.adapter_name, "allowed_domains": source.allowed_domains})
+        db.add(plan); db.flush(); schedule_row = schedule(db, plan.id, data.interval_seconds)
+        jobs = generate(db, plan, profile.payload)
+        result.append({"plan_id": str(plan.id), "source_id": str(source.id), "schedule_id": str(schedule_row.id), "jobs_created": len(jobs)})
+    audit(db, "COLLECTION_PLAN_CREATED", user, None, new={"profile_id": str(profile.id), "plans": result})
+    return {"profile_id": str(profile.id), "plans": result}
+
+@app.get(settings.api_v1_prefix + "/collection-plans")
+def list_collection_plans(db: Session = Depends(get_db), user=Depends(current_user)):
+    return [{"id": str(p.id), "profile_id": str(p.profile_id), "source_id": str(p.source_id), "status": p.status, "policy": p.policy} for p in db.scalars(select(CollectionPlan)).all()]
+
+@app.get(settings.api_v1_prefix + "/collection-jobs")
+def list_collection_jobs(db: Session = Depends(get_db), user=Depends(current_user)):
+    return [{"id": str(j.id), "plan_id": str(j.plan_id), "source_id": str(j.source_id), "query": j.query, "language": j.language, "fingerprint": j.fingerprint, "status": j.status, "attempts": j.attempts} for j in db.scalars(select(CollectionJob).order_by(CollectionJob.created_at.desc())).all()]
+
+@app.post(settings.api_v1_prefix + "/collection-jobs/{job_id}/dispatch")
+def dispatch_job(job_id: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
+    job = db.get(CollectionJob, job_id)
+    if not job: raise HTTPException(404, "Collection job not found")
+    if job.status not in {"QUEUED", "RETRY"}: raise HTTPException(409, "Job is not dispatchable")
+    payload = dispatch(job); job.status = "DISPATCHED"; job.dispatched_at = now(); job.attempts += 1; db.commit()
+    return {"job_id": str(job.id), "status": "DISPATCHED", "payload": payload}
+
+@app.post(settings.api_v1_prefix + "/collection-jobs/{job_id}/celery-dispatch")
+def celery_dispatch(job_id: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
+    job = db.get(CollectionJob, job_id)
+    if not job: raise HTTPException(404, "Collection job not found")
+    task = dispatch_collection_job.delay(str(job.id))
+    return {"job_id": str(job.id), "task_id": task.id, "status": "QUEUED_FOR_WORKER"}
+
+@app.post(settings.api_v1_prefix + "/sources/{source_id}/health")
+def source_health(source_id: uuid.UUID, ok: bool = True, error: str | None = None, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
+    if not db.get(Source, source_id): raise HTTPException(404, "Source not found")
+    record_source_health(db, source_id, ok, error)
+    return {"source_id": str(source_id), "state": "HEALTHY" if ok else "UNHEALTHY"}
+
+@app.post(settings.api_v1_prefix + "/collection-jobs/{job_id}/collect/rss")
+def collect_rss_job(job_id: uuid.UUID, db: Session = Depends(get_db), user=Depends(require_roles("ADMIN", "ANALYST"))):
+    job = db.get(CollectionJob, job_id); source = db.get(Source, job.source_id) if job else None
+    if not job or not source: raise HTTPException(404, "Collection job or source not found")
+    feed_url = job.payload.get("feed_url") or source.config.get("rss_url")
+    if not feed_url: raise HTTPException(422, "No trusted RSS URL is configured for this source")
+    try:
+        result = collect_rss(feed_url, source.allowed_domains, get_checkpoint(db, source.id))
+        saved = preserve(db, job, source, result, object_store=ObjectStore()); save_checkpoint(db, source.id, result["checkpoint_after"])
+        job.status = "SUCCEEDED"; db.commit()
+        return {"job_id": str(job.id), "status": "SUCCEEDED", "items_collected": len(result["entries"]), **saved}
+    except ValueError as exc:
+        job.status = "FAILED"; db.commit(); raise HTTPException(502, str(exc))
