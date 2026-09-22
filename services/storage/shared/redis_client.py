@@ -6,10 +6,6 @@ import os
 from functools import lru_cache
 
 import redis
-from dotenv import load_dotenv
-
-
-load_dotenv()
 
 
 DEFAULT_REDIS_URL = "redis://localhost:6379/0"

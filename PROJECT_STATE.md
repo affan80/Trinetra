@@ -56,3 +56,9 @@ SimHash blocking, MinHash/LSH, conservative similarity decisions, lineage/attrib
 - Hardened HTTP reads to stream and enforce response-size limits before buffering; bounded API lists, scheduler work, and representative scans.
 - Docker Compose syntax is valid, but Docker daemon access is unavailable in this environment, so image build/start could not run.
 - Added `backend/requirements.txt` so Docker installs only the active Layer 1–5 stack; legacy crawler/ML packages remain isolated in the root requirements for legacy services.
+- Added compatibility package paths for legacy `services.common`, `services.shared`, `services.scraper`, `services.parser`, and `services.crawlers` imports without duplicating implementation modules.
+- Optional Scrapy-based tests now skip cleanly when the legacy crawler dependencies are not installed in the minimal backend environment.
+- Removed the unnecessary `python-dotenv` runtime dependency from the active Redis helper; environment variables are read directly.
+- Full repository pytest collection: 8 passed, 2 skipped, 4 deprecation warnings.
+- Compileall, frontend lint, Docker Compose config, and compatibility imports pass. Docker image build remains unverified because the Docker daemon is unavailable.
+- Frontend production build passes with the stable Webpack builder; Next tracing is pinned to the frontend workspace root.

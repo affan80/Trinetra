@@ -1,221 +1,306 @@
-# Trinetra
+# TRINETRA
 
-<<<<<<< HEAD
-Trinetra is a containerized OSINT investigation platform. The default V1 stack
-provides the API, Redis, and the analyst TUI. The legacy pipeline additionally
-starts Kafka, Spark, crawler, worker, PostGIS, Neo4j, and MinIO.
-=======
-## Layer 1 watchlist control
+Evidence-centric OSINT platform with a staged, auditable pipeline:
 
-The current Docker stack runs only PostgreSQL, the FastAPI Layer 1 backend, and the Next.js frontend. It creates validated, deterministic, versioned monitoring profiles; it does not collect OSINT data.
+~~~text
+Layer 1  Watchlists and monitoring profiles
+   ↓
+Layer 2  Collection planning, scheduling, jobs, policies, dispatch
+   ↓
+Layer 3  Raw evidence collection, hashing, storage, provenance
+   ↓
+Layer 4  Canonical-record input seam
+   ↓
+Layer 5  Data quality, exact deduplication, clustering, representative selection
+~~~
 
-```bash
+The active repository preserves source observations and adds deterministic operational metadata. Intelligence analysis is intentionally outside the current Layer 1–5 path: no NER, event extraction, credibility scoring, knowledge graph, RAG, or LLM analysis.
+
+## Current status
+
+Implemented:
+
+- JWT authentication with ADMIN, ANALYST, and VIEWER access control.
+- Watchlist CRUD, lifecycle validation, deterministic requirement parsing, query expansion, and versioned monitoring profiles.
+- Source registry, collection plans, schedules, jobs, Redis handoff, Celery dispatch, retry/rate/checkpoint/health foundations.
+- Hardened HTTP/SSRF validation, RSS discovery fixtures, explicit RSS collection, SHA-256 preservation, MinIO-compatible storage, and provenance records.
+- Layer 5 first slice: canonical record → quality → raw/text fingerprints → exact duplicate lookup → cluster → representative → annotation.
+- Ownership checks for watchlists, plans, jobs, and record endpoints.
+
+Current limits:
+
+- Layer 4 is represented by the minimal canonical_records input seam in this checkout.
+- Layer 3 currently exposes the explicit RSS execution path; WEB/API/document/media adapters are incomplete.
+- Layer 5 currently implements exact raw/text deduplication. SimHash, MinHash/LSH, lineage, media fingerprints, and queue routing remain future work.
+- Alembic has an initial local scaffold; production migrations still need to replace metadata-based creation.
+
+## Repository layout
+
+~~~text
+backend/
+  app/
+    main.py                 FastAPI application and current API routes
+    core/                   configuration and security
+    db/                     SQLAlchemy database, enums, and models
+    services/               Layer 1/2/3 service logic
+    collectors/             Layer 3 adapters
+    security/               SSRF-aware network and HTTP helpers
+    dedup/                  Layer 5 quality, fingerprints, clusters, pipeline
+    workers/                Celery and scheduler entry points
+  alembic/                  database migration scaffold
+  requirements.txt          minimal active backend/container dependencies
+  Dockerfile
+
+frontend/
+  pages/                    Next.js pages for watchlists and collection control
+  package.json
+
+config/                     source registry and scraper configuration
+docs/                       source registry and architecture documentation
+scripts/                    source import and RSS discovery commands
+tests/                      Layer 3/5/security and fixture-based tests
+PROJECT_STATE.md            compact implementation state
+docker-compose.yml          local PostgreSQL/Redis/MinIO/API/worker stack
+~~~
+
+Legacy crawler, processing, graph, Kafka, and model code remains in services/, models/, and related directories for separate work. It is not installed by the active backend Docker image and is not part of the current Layer 1–5 request path.
+
+## Docker quick start
+
+Prerequisites:
+
+- Docker Desktop or another Docker Engine with Compose support.
+
+Start from the repository root:
+
+~~~bash
 cp .env.example .env
 docker compose up --build
-```
+~~~
 
-Register an analyst at `POST /api/v1/auth/register`, then use the bearer token with the watchlist endpoints under `/api/v1`.
+Services:
 
-Trinetra is an India-focused AI platform built for the **Indian Air Force**. It takes scattered public data—news, social media, images, and videos—and turns it into clear, verified, and linked intelligence.
->>>>>>> dacd510 (build mission and Setup containerized development)
+| Service | Address | Purpose |
+|---|---|---|
+| backend | http://localhost:8000 | FastAPI API |
+| frontend | http://localhost:3000 | Next.js UI |
+| postgres | localhost:5432 | System of record |
+| redis | localhost:6379 | Queue/cache handoff |
+| minio | http://localhost:9000 | Raw evidence object storage |
+| MinIO console | http://localhost:9001 | Development storage console |
+| celery | internal | Collection job worker |
+| scheduler | internal | Collection schedule process |
 
-## Choose a stack
+Development Compose credentials are intentionally local-only. Change them in .env before sharing or deploying.
 
-Use one stack at a time: both publish the API on port `8000`.
+~~~bash
+curl http://localhost:8000/health
+~~~
 
-| Stack | Compose file | Use it for |
-| --- | --- | --- |
-| **V1 (recommended)** | `docker-compose.v1.yml` | Multimodal investigations and the Textual analyst TUI |
-| Legacy pipeline | `docker-compose.yml` | Kafka/Spark ingestion, crawler, and supporting data services |
+Expected response:
 
-## Run V1 from scratch (recommended)
+~~~json
+{"status":"healthy"}
+~~~
 
-### 1. Install prerequisites
+Stop the stack:
 
-- Docker Engine 24+ with the Docker Compose plugin (`docker compose version`)
-- Python 3.11, only if you want to run the host-side TUI
-
-On Linux, allow your user to run Docker without `sudo`, then **sign out and
-sign back in** (or reboot):
-
-```bash
-sudo usermod -aG docker "$USER"
-```
-
-Verify the installation:
-
-```bash
-docker version
-docker compose version
-docker ps
-```
-
-If `docker ps` reports permission denied, the group change has not taken effect
-yet. Start a new login session, or use `sudo docker ...` for the commands below.
-
-### 2. Start the API and Redis
-
-From the repository root:
-
-```bash
-docker compose -f docker-compose.v1.yml up -d --build
-docker compose -f docker-compose.v1.yml ps
-```
-
-Expected status:
-
-```text
-NAME                 STATUS
-trinetra-api-1       Up
-trinetra-redis-1     Up (healthy)
-```
-
-Check the API:
-
-```bash
-curl --fail http://127.0.0.1:8000/health
-curl http://127.0.0.1:8000/
-```
-
-The health response should contain `"status":"healthy"`. Interactive API
-documentation is available at <http://127.0.0.1:8000/docs>.
-
-### 3. Start the analyst TUI
-
-The TUI runs on your host terminal and connects to the API at
-`http://127.0.0.1:8000` by default.
-
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-v1.txt
-python -m tui.app.main
-```
-
-In the TUI, select an intake type, enter a title and target, then provide one
-of the following:
-
-- **Upload**: a readable local path to an image, video, audio file, PDF, or document
-- **URL**: a public `http` or `https` URL
-- **Text**: analyst-provided text
-
-Useful keyboard shortcuts: `1` dashboard, `2` new investigation, `4` evidence,
-`7` media analysis, `R` report, `L` agent logs, and `Q` quit.
-
-To point the TUI at a different API host:
-
-```bash
-TRINETRA_API_URL=http://server-name:8000 python -m tui.app.main
-```
-
-### 4. View live service output
-
-```bash
-docker compose -f docker-compose.v1.yml logs -f --tail=100
-```
-
-Stop the V1 stack while retaining investigation artifacts:
-
-```bash
-docker compose -f docker-compose.v1.yml down
-```
-
-To delete the V1 containers **and all persisted raw investigation artifacts**:
-
-```bash
-docker compose -f docker-compose.v1.yml down -v
-```
-
-## Run the legacy pipeline from scratch
-
-First stop V1 if it is running, because both stacks use port `8000`:
-
-```bash
-docker compose -f docker-compose.v1.yml down
-```
-
-Build and start the full pipeline:
-
-```bash
-docker compose up -d --build
-docker compose ps
-```
-
-Monitor services in a terminal-style view:
-
-```bash
-watch -n 2 'docker compose ps'
-```
-
-Follow the services most likely to expose startup errors:
-
-```bash
-docker compose logs -f --tail=100 api crawler spark-processor worker
-```
-
-Verify the API after the services have started:
-
-```bash
-curl --fail http://127.0.0.1:8000/health
-```
-
-Expected service behaviour:
-
-| Service | Expected status |
-| --- | --- |
-| `api`, `worker`, `spark-master`, `spark-worker`, `spark-processor` | `Up` |
-| `redis` | `Up (healthy)` |
-| `kafka`, `zookeeper`, `postgis`, `neo4j`, `minio` | `Up` |
-| `crawler` | `Exited (0)` after its bounded crawl, or `Up` while crawling |
-
-`crawler` uses `restart: on-failure`; it must not continuously restart after a
-successful crawl. If any service shows `Restarting` or `Exited (1)`, capture its
-last logs before changing configuration:
-
-```bash
-docker compose logs --tail=200 crawler spark-processor api worker
-```
-
-Service URLs and local development credentials:
-
-| Service | Address | Credentials |
-| --- | --- | --- |
-| API | <http://localhost:8000/docs> | None |
-| Spark master | <http://localhost:8080> | None |
-| MinIO console | <http://localhost:9001> | `minioadmin` / `minioadmin` |
-| Neo4j browser | <http://localhost:7474> | `neo4j` / `password` |
-| PostGIS | `localhost:5432` | `osint_user` / `osint_password` |
-
-Stop the legacy stack while keeping database volumes:
-
-```bash
+~~~bash
 docker compose down
-```
+~~~
 
-To reset the legacy stack completely, including Redis, Spark checkpoints,
-PostGIS, Neo4j, and MinIO data (**destructive**):
+Named PostgreSQL and MinIO volumes are retained. Reset local data only when intentional:
 
-```bash
+~~~bash
 docker compose down -v
-docker compose up -d --build
-```
+~~~
 
-## Troubleshooting
+## Configuration
 
-| Symptom | Resolution |
-| --- | --- |
-| `permission denied ... /var/run/docker.sock` | Run `sudo usermod -aG docker "$USER"`, log out and back in, then rerun `docker ps`. |
-| `port is already allocated` on `8000` | Stop the other stack with `docker compose -f docker-compose.v1.yml down` or `docker compose down`. |
-| API health check fails | Run `docker compose logs --tail=200 api` for the active stack. |
-| Spark processor restarts | Run `docker compose logs --tail=200 spark-processor`; verify Kafka and Spark master are `Up`. |
-| Crawler restarts | Run `docker compose logs --tail=200 crawler`; a successful finite crawl should finish as `Exited (0)`. |
+Copy .env.example to .env:
 
-For infrastructure-specific notes, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+~~~env
+DATABASE_URL=postgresql+psycopg://trinetra:trinetra@postgres:5432/trinetra
+REDIS_URL=redis://redis:6379/0
+MINIO_ENDPOINT=minio:9000
+MINIO_ACCESS_KEY=trinetra
+MINIO_SECRET_KEY=replace-with-a-secret
+MINIO_BUCKET_RAW=raw-evidence
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+APP_ENV=development
+API_V1_PREFIX=/api/v1
+~~~
 
-## Kubernetes
+Never commit real secrets. The backend defaults to SQLite for lightweight local tests when DATABASE_URL is unset; Docker uses PostgreSQL.
 
-Legacy Kubernetes manifests are in `k8s/base/`:
+## API
 
-```bash
-kubectl apply -f k8s/base/
-```
+Base path: /api/v1
+
+Authentication:
+
+~~~text
+POST /auth/register
+POST /auth/login
+~~~
+
+Watchlists and monitoring profiles:
+
+~~~text
+POST   /watchlists
+GET    /watchlists
+GET    /watchlists/{id}
+PATCH  /watchlists/{id}
+POST   /watchlists/{id}/validate
+POST   /watchlists/{id}/compile
+POST   /watchlists/{id}/activate
+POST   /watchlists/{id}/pause
+POST   /watchlists/{id}/archive
+GET    /watchlists/{id}/preview-queries
+GET    /watchlists/{id}/monitoring-profile
+GET    /watchlists/{id}/audit
+~~~
+
+Layer 2 collection control:
+
+~~~text
+POST /sources
+GET  /sources
+GET  /collectors
+POST /collectors/heartbeat
+
+POST /collection-plans
+GET  /collection-plans
+GET  /collection-jobs
+POST /collection-jobs/{id}/dispatch
+POST /collection-jobs/{id}/celery-dispatch
+POST /sources/{id}/health
+~~~
+
+Layer 3 explicit RSS path:
+
+~~~text
+POST /collection-jobs/{id}/collect/rss
+~~~
+
+Layer 5 processing and reads:
+
+~~~text
+POST /records/{id}/deduplicate
+GET  /records/{id}/quality
+GET  /records/{id}/duplicates
+GET  /records/{id}/similarities
+GET  /duplicate-clusters/{id}/members
+~~~
+
+Protected endpoints require a bearer token from registration or login. Non-admin users can access only records and collection resources connected to their own watchlists. VIEWER is read-only.
+
+## Typical workflow
+
+1. Register or log in.
+2. Create a watchlist as ANALYST.
+3. Validate it, compile a monitoring profile, and activate it.
+4. Register enabled sources as ADMIN.
+5. Create collection plans for the active profile.
+6. Dispatch a generated job.
+7. For a trusted configured RSS source, run the explicit RSS collection endpoint.
+8. Submit a Layer 4 canonical record to the Layer 5 deduplication endpoint.
+9. Read its quality annotation, cluster membership, and representative assignment.
+
+Collection and deduplication are non-destructive: raw evidence, canonical records, provenance, and duplicate observations remain preserved.
+
+## Source registry tools
+
+The approved source document is docs/source_registry.md. Import it into the version-controlled manifest:
+
+~~~bash
+python scripts/import_source_registry.py docs/source_registry.md
+~~~
+
+The importer writes config/source_registry.yaml and reports parsed, merged, missing, and invalid entries. Tracking parameters are removed and URLs are canonicalized; missing URLs are disabled rather than guessed.
+
+RSS discovery supports bounded runs:
+
+~~~bash
+python scripts/discover_rss.py --source SRC-PIB
+python scripts/discover_rss.py --sector NEWS --limit 20
+python scripts/discover_rss.py --all-enabled --limit 20
+~~~
+
+Tests use local RSS and autodiscovery fixtures. Check robots and usage policies before broad discovery against third-party sites.
+
+## Local development
+
+Backend:
+
+~~~bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+PYTHONPATH=. uvicorn backend.app.main:app --reload --port 8000
+~~~
+
+For PostgreSQL-backed development, export DATABASE_URL and the other values from .env. Leave DATABASE_URL unset for the default SQLite test seam.
+
+Frontend:
+
+~~~bash
+cd frontend
+npm ci
+npm run dev
+~~~
+
+The frontend currently provides basic watchlist and collection-control pages, prioritizing functionality over finished visual design.
+
+## Verification
+
+Run the active Layer 1–5 regression and security tests:
+
+~~~bash
+PYTHONPATH=. python -m pytest -q \
+  backend/tests/test_layer1.py \
+  tests/test_layer3.py \
+  tests/test_layer5.py \
+  tests/test_security_audit.py
+~~~
+
+Other checks:
+
+~~~bash
+PYTHONPATH=. python -m compileall -q backend/app tests scripts
+cd frontend && npm run lint
+cd frontend && npm run build
+cd .. && docker compose config
+~~~
+
+The tests cover watchlist CRUD, RSS fixtures, hashing/storage paths, exact deduplication, idempotent reruns, ownership checks, and security-oriented URL behavior. Docker image startup additionally requires a running Docker daemon.
+
+## Security boundaries
+
+- Passwords are hashed and JWTs expire using ACCESS_TOKEN_EXPIRE_MINUTES.
+- Active API paths use ORM/parameterized database operations.
+- Ownership and role checks protect watchlists, plans, jobs, and Layer 5 record reads.
+- Outbound HTTP helpers validate schemes, DNS/IP destinations, redirects, ports, timeouts, and response sizes.
+- HTTP bodies are bounded before buffering; API lists and cluster scans are bounded and paginated.
+- Raw evidence is SHA-256 hashed and stored through the object-store abstraction with provenance.
+- The current React UI uses normal rendering; no dangerouslySetInnerHTML, innerHTML, or eval sink is present.
+
+This is a development platform, not a production security certification. Run dependency scanning, backups, secret rotation, container hardening, and external penetration testing before deployment.
+
+## Design constraints
+
+Layer 1–5 deliberately does not include:
+
+~~~text
+Kafka, Kubernetes, Neo4j, OpenSearch, Qdrant, ML/LLM analysis,
+NER, OCR, ASR, translation, claim/event extraction, credibility scoring,
+knowledge graphs, evidence graphs, RAG, or intelligence alert detection.
+~~~
+
+The active backend image installs only backend/requirements.txt. The root requirements.txt remains for legacy scraper/model experiments and is not used by the Docker backend image.
+
+## Project state
+
+PROJECT_STATE.md is the compact source of truth for implementation milestones, schema status, thresholds, tests, and known issues. Update it whenever a meaningful layer milestone changes.

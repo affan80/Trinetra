@@ -1,7 +1,10 @@
 import sys
 import os
+import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+pytest.importorskip("scrapy", reason="legacy crawler dependencies are optional")
 
 try:
     from services.crawlers.spiders.blog_spider import BlogSpider
