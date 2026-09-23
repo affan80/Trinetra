@@ -1,8 +1,8 @@
 import json
 from urllib.parse import urljoin, urlparse
 
-from services.common.text_cleaner import clean_text
-from services.scraper.config import get_scrapling_settings
+from services.storage.common.text_cleaner import clean_text
+from services.ingestion.scraper.config import get_scrapling_settings
 
 try:
     from scrapling import Selector

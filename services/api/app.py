@@ -2,10 +2,10 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
-from services.shared.redis_client import ping_redis, get_redis_client
-from services.shared.redis_metrics import RedisMetrics
-from services.shared.redis_queue import RedisQueue
-from services.shared.url_frontier import UrlFrontier
+from services.storage.shared.redis_client import ping_redis, get_redis_client
+from services.storage.shared.redis_metrics import RedisMetrics
+from services.storage.shared.redis_queue import RedisQueue
+from services.storage.shared.url_frontier import UrlFrontier
 from services.investigations import InvestigationRepository, InvestigationWorkflow
 from services.investigations.multimodal import MultimodalIngestor
 from services.investigations.schemas import (

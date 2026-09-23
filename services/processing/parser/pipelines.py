@@ -4,10 +4,10 @@ import os
 from datetime import datetime, timezone
 from kafka import KafkaProducer
 from scrapy.exceptions import DropItem
-from services.shared.redis_queue import RedisQueue
-from services.shared.redis_metrics import RedisMetrics
-from services.shared.redis_client import ping_redis
-from services.shared.redis_dedupe import RedisDedupe
+from services.storage.shared.redis_queue import RedisQueue
+from services.storage.shared.redis_metrics import RedisMetrics
+from services.storage.shared.redis_client import ping_redis
+from services.storage.shared.redis_dedupe import RedisDedupe
 
 logger = logging.getLogger(__name__)
 

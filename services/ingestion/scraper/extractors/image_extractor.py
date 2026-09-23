@@ -1,5 +1,5 @@
-from services.common.text_cleaner import clean_text
-from services.scraper.extractors.base import ScraplingExtractor
+from services.storage.common.text_cleaner import clean_text
+from services.ingestion.scraper.extractors.base import ScraplingExtractor
 
 
 class ImageExtractor(ScraplingExtractor):

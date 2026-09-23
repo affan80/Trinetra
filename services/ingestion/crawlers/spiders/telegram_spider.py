@@ -2,8 +2,8 @@ import os
 import scrapy
 from dotenv import load_dotenv
 
-from services.common.items import NewsItem
-from services.scraper.surfaceweb.telegram_scraper import TelegramScraper
+from services.storage.common.items import NewsItem
+from services.ingestion.scraper.surfaceweb.telegram_scraper import TelegramScraper
 
 
 class TelegramSpider(scrapy.Spider):

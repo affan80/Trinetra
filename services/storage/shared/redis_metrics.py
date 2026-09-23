@@ -6,7 +6,7 @@ from typing import Any
 
 import redis
 
-from services.shared.redis_client import get_redis_client
+from services.storage.shared.redis_client import get_redis_client
 
 
 class RedisMetrics:

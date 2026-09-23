@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 
-from services.scraper.config import env_bool, env_int
+from services.ingestion.scraper.config import env_bool, env_int
 
 
 def env_list(name):

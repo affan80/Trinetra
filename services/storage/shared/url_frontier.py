@@ -3,11 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from services.scraper.discovery import UrlCandidate
-from services.scraper.policy import SourcePolicy
-from services.shared.redis_dedupe import RedisDedupe
-from services.shared.redis_metrics import RedisMetrics
-from services.shared.redis_queue import RedisQueue
+from services.ingestion.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.policy import SourcePolicy
+from services.storage.shared.redis_dedupe import RedisDedupe
+from services.storage.shared.redis_metrics import RedisMetrics
+from services.storage.shared.redis_queue import RedisQueue
 
 
 FRONTIER_METRICS = {

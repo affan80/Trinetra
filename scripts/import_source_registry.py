@@ -20,6 +20,15 @@ def canonical_url(value: str) -> str:
     if path != "/": path = path.rstrip("/")
     return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), path, query, ""))
 
+def canonical_host(hostname: str) -> str:
+    host = hostname.lower().rstrip(".")
+    return host[4:] if host.startswith("www.") else host
+
+def allowed_domains(hostname: str) -> list[str]:
+    host = hostname.lower().rstrip(".")
+    root = canonical_host(host)
+    return list(dict.fromkeys([host, root, f"www.{root}"]))
+
 def source_id(hostname: str, path: str = "/") -> str:
     suffix = "" if path in {"", "/"} else "-" + re.sub(r"[^A-Z0-9]+", "-", path.upper()).strip("-")
     return ("SRC-" + re.sub(r"[^A-Z0-9]+", "-", hostname.upper()).strip("-") + suffix)[:60].rstrip("-")
@@ -50,9 +59,11 @@ def parse_document(path: Path) -> tuple[list[dict], int, int]:
         url = canonical_url(raw_url)
         host = urlsplit(url).hostname
         if not host: continue
+        host = canonical_host(host)
         key = (host, urlsplit(url).path or "/")
         preferred, fallback, discover = preferred_adapter(sector, name)
-        row = records.setdefault(key, {"id": source_id(host, urlsplit(url).path), "name": name.strip(), "sector": [], "source_class": "NEWS" if sector == "NEWS" else "BLOG" if sector == "BLOG_ANALYSIS" else "GOVERNMENT" if sector == "GOVERNMENT" else "OTHER", "base_url": url, "allowed_domains": [host], "enabled": True, "preferred_adapter": preferred, "fallback_adapter": fallback, "language": ["en"], "country": [], "priority": "MEDIUM", "discover_rss": discover, "robots_policy": "CHECK", "auth_type": "NONE"})
+        row = records.setdefault(key, {"id": source_id(host, urlsplit(url).path), "name": name.strip(), "sector": [], "source_class": "NEWS" if sector == "NEWS" else "BLOG" if sector == "BLOG_ANALYSIS" else "GOVERNMENT" if sector == "GOVERNMENT" else "OTHER", "base_url": url, "allowed_domains": allowed_domains(host), "enabled": True, "preferred_adapter": preferred, "fallback_adapter": fallback, "language": ["en"], "country": [], "priority": "MEDIUM", "discover_rss": discover, "robots_policy": "CHECK", "auth_type": "NONE"})
+        row["allowed_domains"] = list(dict.fromkeys(row["allowed_domains"] + allowed_domains(host)))
         if sector not in row["sector"]: row["sector"].append(sector)
     return list(records.values()), missing, parsed
 
@@ -71,7 +82,7 @@ def main():
         try:
             for row in records:
                 existing = db.query(Source).filter(Source.name == row["name"]).first()
-                values = {"name": row["name"], "source_class": row["source_class"], "adapter_name": row["preferred_adapter"].lower(), "enabled": row["enabled"], "allowed_domains": [urlsplit(row["base_url"]).hostname], "config": {"base_url": row["base_url"], "discover_rss": row["discover_rss"]}}
+                values = {"name": row["name"], "source_class": row["source_class"], "adapter_name": row["preferred_adapter"].lower(), "enabled": row["enabled"], "allowed_domains": row["allowed_domains"], "config": {"base_url": row["base_url"], "discover_rss": row["discover_rss"]}}
                 if existing: [setattr(existing, key, value) for key, value in values.items() if key != "name"]
                 else: db.add(Source(**values))
             db.commit()

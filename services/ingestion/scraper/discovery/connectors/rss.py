@@ -5,8 +5,8 @@ from typing import Any
 
 from lxml import etree
 
-from services.scraper.discovery import UrlCandidate
-from services.scraper.discovery.connectors.base import HttpDiscoveryConnector
+from services.ingestion.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.discovery.connectors.base import HttpDiscoveryConnector
 
 
 class RssConnector(HttpDiscoveryConnector):

@@ -1,8 +1,8 @@
 import re
 
-from services.common.date_time import parse_date
-from services.common.text_cleaner import clean_text
-from services.scraper.extractors.article_extractor import ArticleExtractor
+from services.storage.common.date_time import parse_date
+from services.storage.common.text_cleaner import clean_text
+from services.ingestion.scraper.extractors.article_extractor import ArticleExtractor
 
 
 class BlogExtractor(ArticleExtractor):

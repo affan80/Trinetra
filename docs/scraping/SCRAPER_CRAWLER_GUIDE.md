@@ -74,7 +74,7 @@ scrapy runspider services/crawlers/spiders/news_spider.py -a urls=https://www.bb
 Runs discovery connectors and prints normalized URL candidates without writing to Redis.
 ```bash
 export PYTHONPATH="."
-python -m services.scraper.discovery.run_discovery \
+python -m services.ingestion.scraper.discovery.run_discovery \
   --dry-run \
   --connectors rss,sitemap \
   --max-results 5
@@ -84,7 +84,7 @@ python -m services.scraper.discovery.run_discovery \
 Runs discovery and enqueues accepted URL candidates into the Redis URL frontier.
 ```bash
 export PYTHONPATH="."
-python -m services.scraper.discovery.run_discovery \
+python -m services.ingestion.scraper.discovery.run_discovery \
   --connectors rss,sitemap \
   --max-results 25
 ```

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import os
 
-from services.scraper.discovery import UrlCandidate
-from services.scraper.discovery.connectors.base import HttpDiscoveryConnector
+from services.ingestion.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.discovery.connectors.base import HttpDiscoveryConnector
 
 
 class BraveSearchConnector(HttpDiscoveryConnector):

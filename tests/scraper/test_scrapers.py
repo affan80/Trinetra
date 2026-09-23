@@ -8,11 +8,11 @@ pytest.importorskip("scrapy", reason="legacy crawler dependencies are optional")
 
 from scrapy.http import HtmlResponse, Request
 
-from services.crawlers.spiders.frontier_spider import FrontierSpider
-from services.crawlers.spiders.image_spider import ImageSpider
-from services.parser.pipelines import OsintPipeline
-from services.scraper.discovery import UrlCandidate
-from services.scraper.discovery.connectors import (
+from services.ingestion.crawlers.spiders.frontier_spider import FrontierSpider
+from services.ingestion.crawlers.spiders.image_spider import ImageSpider
+from services.processing.parser.pipelines import OsintPipeline
+from services.ingestion.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.discovery.connectors import (
     BraveSearchConnector,
     CommonCrawlConnector,
     GdeltConnector,
@@ -21,11 +21,11 @@ from services.scraper.discovery.connectors import (
     SitemapConnector,
     YouTubeConnector,
 )
-from services.scraper.extractors import ArticleExtractor, BlogExtractor
-from services.scraper.fetchers import ScraplingFetchClient
-from services.scraper.policy import FetchPolicy, SourcePolicy, SourceRegistry, SourceRegistryEntry
-from services.scraper.surfaceweb.image_scraper import ImageScraper
-from services.shared.url_frontier import UrlFrontier
+from services.ingestion.scraper.extractors import ArticleExtractor, BlogExtractor
+from services.ingestion.scraper.fetchers import ScraplingFetchClient
+from services.ingestion.scraper.policy import FetchPolicy, SourcePolicy, SourceRegistry, SourceRegistryEntry
+from services.ingestion.scraper.surfaceweb.image_scraper import ImageScraper
+from services.storage.shared.url_frontier import UrlFrontier
 
 
 def make_response(url, html):

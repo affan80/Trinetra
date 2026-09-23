@@ -1,10 +1,10 @@
 import scrapy
 from urllib.parse import urlparse, urldefrag
 
-from services.common.items import BlogItem
-from services.scraper.surfaceweb.blog_scraper import BlogScraper
-from services.scraper.fetchers import ScraplingFetchClient
-from services.scraper.policy import FetchPolicy
+from services.storage.common.items import BlogItem
+from services.ingestion.scraper.surfaceweb.blog_scraper import BlogScraper
+from services.ingestion.scraper.fetchers import ScraplingFetchClient
+from services.ingestion.scraper.policy import FetchPolicy
 
 
 class BlogSpider(scrapy.Spider):

@@ -20,11 +20,14 @@ def discover(base_url: str, allowed_domains: list[str], *, fetcher=fetch) -> lis
     candidates.extend(urljoin(base_url, path) for path in FEED_PATHS)
     found = []
     seen = set()
+    found_urls = set()
     for candidate in candidates:
         if candidate in seen or urlsplit(candidate).hostname not in allowed_domains: continue
         seen.add(candidate)
         try:
             response = fetcher(candidate, allowed_domains, max_bytes=10 * 1024 * 1024); ok, kind = valid_feed(response.body)
-            if ok: found.append({"rss_url": response.final_url, "rss_type": kind, "validation_status": "VALID", "discovery_method": "html_link" if candidate not in [urljoin(base_url, p) for p in FEED_PATHS] else "conventional_path"})
+            if ok and response.final_url not in found_urls:
+                found_urls.add(response.final_url)
+                found.append({"rss_url": response.final_url, "rss_type": kind, "validation_status": "VALID", "discovery_method": "html_link" if candidate not in [urljoin(base_url, p) for p in FEED_PATHS] else "conventional_path"})
         except (ValueError, OSError): continue
     return found

@@ -1,11 +1,12 @@
 sources:
-- id: SRC-WWW-ALJAZEERA-COM
+- id: SRC-ALJAZEERA-COM
   name: Al Jazeera
   sector:
   - NEWS
   source_class: NEWS
   base_url: https://www.aljazeera.com/
   allowed_domains:
+  - aljazeera.com
   - www.aljazeera.com
   enabled: true
   preferred_adapter: RSS
@@ -17,13 +18,14 @@ sources:
   discover_rss: true
   robots_policy: CHECK
   auth_type: NONE
-- id: SRC-WWW-CSIS-ORG
+- id: SRC-CSIS-ORG
   name: CSIS
   sector:
   - BLOG_ANALYSIS
   source_class: BLOG
   base_url: https://www.csis.org/
   allowed_domains:
+  - csis.org
   - www.csis.org
   enabled: true
   preferred_adapter: RSS
@@ -43,6 +45,4074 @@ sources:
   base_url: https://books.toscrape.com/
   allowed_domains:
   - books.toscrape.com
+  - www.books.toscrape.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-PIB-GOV-IN
+  name: pib.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://pib.gov.in/
+  allowed_domains:
+  - pib.gov.in
+  - www.pib.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MOD-GOV-IN
+  name: mod.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://mod.gov.in/
+  allowed_domains:
+  - mod.gov.in
+  - www.mod.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DRDO-GOV-IN
+  name: drdo.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.drdo.gov.in/
+  allowed_domains:
+  - drdo.gov.in
+  - www.drdo.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INDIANARMY-NIC-IN
+  name: indianarmy.nic.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://indianarmy.nic.in/
+  allowed_domains:
+  - indianarmy.nic.in
+  - www.indianarmy.nic.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INDIANAIRFORCE-NIC-IN
+  name: indianairforce.nic.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://indianairforce.nic.in/
+  allowed_domains:
+  - indianairforce.nic.in
+  - www.indianairforce.nic.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DDPMOD-GOV-IN
+  name: ddpmod.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.ddpmod.gov.in/
+  allowed_domains:
+  - ddpmod.gov.in
+  - www.ddpmod.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MHA-GOV-IN
+  name: mha.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.mha.gov.in/
+  allowed_domains:
+  - mha.gov.in
+  - www.mha.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MEA-GOV-IN
+  name: mea.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.mea.gov.in/
+  allowed_domains:
+  - mea.gov.in
+  - www.mea.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-CIVILAVIATION-GOV-IN
+  name: civilaviation.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.civilaviation.gov.in/
+  allowed_domains:
+  - civilaviation.gov.in
+  - www.civilaviation.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DOS-GOV-IN
+  name: dos.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.dos.gov.in/
+  allowed_domains:
+  - dos.gov.in
+  - www.dos.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ISRO-GOV-IN
+  name: isro.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.isro.gov.in/
+  allowed_domains:
+  - isro.gov.in
+  - www.isro.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INSPACE-GOV-IN
+  name: inspace.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.inspace.gov.in/
+  allowed_domains:
+  - inspace.gov.in
+  - www.inspace.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NITI-GOV-IN
+  name: niti.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.niti.gov.in/
+  allowed_domains:
+  - niti.gov.in
+  - www.niti.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MEITY-GOV-IN
+  name: meity.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.meity.gov.in/
+  allowed_domains:
+  - meity.gov.in
+  - www.meity.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-COMMERCE-GOV-IN
+  name: commerce.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.commerce.gov.in/
+  allowed_domains:
+  - commerce.gov.in
+  - www.commerce.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SHIPMIN-GOV-IN
+  name: shipmin.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://shipmin.gov.in/
+  allowed_domains:
+  - shipmin.gov.in
+  - www.shipmin.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INDIANRAILWAYS-GOV-IN
+  name: indianrailways.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://indianrailways.gov.in/
+  allowed_domains:
+  - indianrailways.gov.in
+  - www.indianrailways.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FINMIN-GOV-IN
+  name: finmin.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.finmin.gov.in/
+  allowed_domains:
+  - finmin.gov.in
+  - www.finmin.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DST-GOV-IN
+  name: dst.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://dst.gov.in/
+  allowed_domains:
+  - dst.gov.in
+  - www.dst.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DOT-GOV-IN
+  name: dot.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://dot.gov.in/
+  allowed_domains:
+  - dot.gov.in
+  - www.dot.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NDMA-GOV-IN
+  name: ndma.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://ndma.gov.in/
+  allowed_domains:
+  - ndma.gov.in
+  - www.ndma.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INDIA-GOV-IN
+  name: india.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.india.gov.in/
+  allowed_domains:
+  - india.gov.in
+  - www.india.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DATA-GOV-IN
+  name: data.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://data.gov.in/
+  allowed_domains:
+  - data.gov.in
+  - www.data.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EPROCURE-GOV-IN-EPROCURE-APP
+  name: eprocure.gov.in/eprocure/app
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://eprocure.gov.in/eprocure/app
+  allowed_domains:
+  - eprocure.gov.in
+  - www.eprocure.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EPROCURE-GOV-IN-EPUBLISH-APP
+  name: eprocure.gov.in/epublish/app
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://eprocure.gov.in/epublish/app
+  allowed_domains:
+  - eprocure.gov.in
+  - www.eprocure.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GEM-GOV-IN
+  name: gem.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://gem.gov.in/
+  allowed_domains:
+  - gem.gov.in
+  - www.gem.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SANSAD-IN
+  name: sansad.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://sansad.in/
+  allowed_domains:
+  - sansad.in
+  - www.sansad.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INDIACODE-NIC-IN
+  name: indiacode.nic.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.indiacode.nic.in/
+  allowed_domains:
+  - indiacode.nic.in
+  - www.indiacode.nic.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SCI-GOV-IN
+  name: sci.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.sci.gov.in/
+  allowed_domains:
+  - sci.gov.in
+  - www.sci.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ECOURTS-GOV-IN
+  name: ecourts.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://ecourts.gov.in/
+  allowed_domains:
+  - ecourts.gov.in
+  - www.ecourts.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ECI-GOV-IN
+  name: eci.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.eci.gov.in/
+  allowed_domains:
+  - eci.gov.in
+  - www.eci.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-IPINDIA-GOV-IN
+  name: ipindia.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://ipindia.gov.in/
+  allowed_domains:
+  - ipindia.gov.in
+  - www.ipindia.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SEBI-GOV-IN
+  name: sebi.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.sebi.gov.in/
+  allowed_domains:
+  - sebi.gov.in
+  - www.sebi.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-RBI-ORG-IN
+  name: rbi.org.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.rbi.org.in/
+  allowed_domains:
+  - rbi.org.in
+  - www.rbi.org.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-CAG-GOV-IN
+  name: cag.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://cag.gov.in/
+  allowed_domains:
+  - cag.gov.in
+  - www.cag.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-UIDAI-GOV-IN
+  name: uidai.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://uidai.gov.in/
+  allowed_domains:
+  - uidai.gov.in
+  - www.uidai.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NIC-GOV-IN
+  name: nic.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.nic.gov.in/
+  allowed_domains:
+  - nic.gov.in
+  - www.nic.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NHAI-GOV-IN
+  name: nhai.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://nhai.gov.in/
+  allowed_domains:
+  - nhai.gov.in
+  - www.nhai.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DGCA-GOV-IN
+  name: dgca.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.dgca.gov.in/
+  allowed_domains:
+  - dgca.gov.in
+  - www.dgca.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AAI-AERO
+  name: aai.aero
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.aai.aero/
+  allowed_domains:
+  - aai.aero
+  - www.aai.aero
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DGSHIPPING-GOV-IN
+  name: dgshipping.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.dgshipping.gov.in/
+  allowed_domains:
+  - dgshipping.gov.in
+  - www.dgshipping.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-IPA-NIC-IN
+  name: ipa.nic.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.ipa.nic.in/
+  allowed_domains:
+  - ipa.nic.in
+  - www.ipa.nic.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SURVEYOFINDIA-GOV-IN
+  name: surveyofindia.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://surveyofindia.gov.in/
+  allowed_domains:
+  - surveyofindia.gov.in
+  - www.surveyofindia.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NRSC-GOV-IN
+  name: nrsc.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.nrsc.gov.in/
+  allowed_domains:
+  - nrsc.gov.in
+  - www.nrsc.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BHUVAN-NRSC-GOV-IN
+  name: bhuvan.nrsc.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://bhuvan.nrsc.gov.in/
+  allowed_domains:
+  - bhuvan.nrsc.gov.in
+  - www.bhuvan.nrsc.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GSI-GOV-IN
+  name: gsi.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://www.gsi.gov.in/
+  allowed_domains:
+  - gsi.gov.in
+  - www.gsi.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INDIANCOASTGUARD-GOV-IN
+  name: indiancoastguard.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://indiancoastguard.gov.in/
+  allowed_domains:
+  - indiancoastguard.gov.in
+  - www.indiancoastguard.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BRO-GOV-IN
+  name: bro.gov.in
+  sector:
+  - GOVERNMENT
+  source_class: GOVERNMENT
+  base_url: https://bro.gov.in/
+  allowed_domains:
+  - bro.gov.in
+  - www.bro.gov.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-TATAADVANCEDSYSTEMS-COM
+  name: tataadvancedsystems.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.tataadvancedsystems.com/
+  allowed_domains:
+  - tataadvancedsystems.com
+  - www.tataadvancedsystems.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ADANIDEFENCE-COM
+  name: adanidefence.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.adanidefence.com/
+  allowed_domains:
+  - adanidefence.com
+  - www.adanidefence.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BHARATFORGE-COM
+  name: bharatforge.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.bharatforge.com/
+  allowed_domains:
+  - bharatforge.com
+  - www.bharatforge.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MAHINDRA-COM
+  name: mahindra.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.mahindra.com/
+  allowed_domains:
+  - mahindra.com
+  - www.mahindra.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SOLARGROUP-COM
+  name: solargroup.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.solargroup.com/
+  allowed_domains:
+  - solargroup.com
+  - www.solargroup.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DATAPATTERNSINDIA-COM
+  name: datapatternsindia.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.datapatternsindia.com/
+  allowed_domains:
+  - datapatternsindia.com
+  - www.datapatternsindia.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ASTRAMWP-COM
+  name: astramwp.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://astramwp.com/
+  allowed_domains:
+  - astramwp.com
+  - www.astramwp.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-IDEAFORGETECH-COM
+  name: ideaforgetech.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://ideaforgetech.com/
+  allowed_domains:
+  - ideaforgetech.com
+  - www.ideaforgetech.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-PARASAEROSPACE-COM
+  name: parasaerospace.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://parasaerospace.com/
+  allowed_domains:
+  - parasaerospace.com
+  - www.parasaerospace.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GARUDAAEROSPACE-COM
+  name: garudaaerospace.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.garudaaerospace.com/
+  allowed_domains:
+  - garudaaerospace.com
+  - www.garudaaerospace.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AGNIKUL-IN
+  name: agnikul.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://agnikul.in/
+  allowed_domains:
+  - agnikul.in
+  - www.agnikul.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SKYROOT-IN
+  name: skyroot.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://skyroot.in/
+  allowed_domains:
+  - skyroot.in
+  - www.skyroot.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-PIXXEL-SPACE
+  name: pixxel.space
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.pixxel.space/
+  allowed_domains:
+  - pixxel.space
+  - www.pixxel.space
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DHRUVASPACE-COM
+  name: dhruvaspace.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.dhruvaspace.com/
+  allowed_domains:
+  - dhruvaspace.com
+  - www.dhruvaspace.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BELLATRIX-AERO
+  name: bellatrix.aero
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://bellatrix.aero/
+  allowed_domains:
+  - bellatrix.aero
+  - www.bellatrix.aero
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GALAXEYE-SPACE
+  name: galaxeye.space
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.galaxeye.space/
+  allowed_domains:
+  - galaxeye.space
+  - www.galaxeye.space
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SAMTELAVIONICS-COM
+  name: samtelavionics.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://samtelavionics.com/
+  allowed_domains:
+  - samtelavionics.com
+  - www.samtelavionics.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ALTISAEROSPACE-COM
+  name: altisaerospace.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.altisaerospace.com/
+  allowed_domains:
+  - altisaerospace.com
+  - www.altisaerospace.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-RATHIAEROSPACE-IN
+  name: rathiaerospace.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.rathiaerospace.in/
+  allowed_domains:
+  - rathiaerospace.in
+  - www.rathiaerospace.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-IADGROUP-IN
+  name: iadgroup.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.iadgroup.in/
+  allowed_domains:
+  - iadgroup.in
+  - www.iadgroup.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-LEAPEDGEAEROSPACE-COM
+  name: leapedgeaerospace.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.leapedgeaerospace.com/
+  allowed_domains:
+  - leapedgeaerospace.com
+  - www.leapedgeaerospace.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-HAL-INDIA-CO-IN
+  name: hal-india.co.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://hal-india.co.in/
+  allowed_domains:
+  - hal-india.co.in
+  - www.hal-india.co.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BEL-INDIA-IN
+  name: bel-india.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://bel-india.in/
+  allowed_domains:
+  - bel-india.in
+  - www.bel-india.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BDL-INDIA-IN
+  name: bdl-india.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.bdl-india.in/
+  allowed_domains:
+  - bdl-india.in
+  - www.bdl-india.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BEMLINDIA-IN
+  name: bemlindia.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.bemlindia.in/
+  allowed_domains:
+  - bemlindia.in
+  - www.bemlindia.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MIDHANI-INDIA-IN
+  name: midhani-india.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://midhani-india.in/
+  allowed_domains:
+  - midhani-india.in
+  - www.midhani-india.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MAZAGONDOCK-IN
+  name: mazagondock.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://mazagondock.in/
+  allowed_domains:
+  - mazagondock.in
+  - www.mazagondock.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GRSE-IN
+  name: grse.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.grse.in/
+  allowed_domains:
+  - grse.in
+  - www.grse.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-COCHINSHIPYARD-IN
+  name: cochinshipyard.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://cochinshipyard.in/
+  allowed_domains:
+  - cochinshipyard.in
+  - www.cochinshipyard.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-TATAELXSI-COM
+  name: tataelxsi.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.tataelxsi.com/
+  allowed_domains:
+  - tataelxsi.com
+  - www.tataelxsi.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-LARSENTOUBRO-COM
+  name: larsentoubro.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.larsentoubro.com/
+  allowed_domains:
+  - larsentoubro.com
+  - www.larsentoubro.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GODREJ-COM
+  name: godrej.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.godrej.com/
+  allowed_domains:
+  - godrej.com
+  - www.godrej.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DYNAMATICS-COM
+  name: dynamatics.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.dynamatics.com/
+  allowed_domains:
+  - dynamatics.com
+  - www.dynamatics.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ROSSELLTECHSYS-COM
+  name: rosselltechsys.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.rosselltechsys.com/
+  allowed_domains:
+  - rosselltechsys.com
+  - www.rosselltechsys.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AXISCADES-COM
+  name: axiscades.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.axiscades.com/
+  allowed_domains:
+  - axiscades.com
+  - www.axiscades.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-PARASDEFENCE-COM
+  name: parasdefence.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://parasdefence.com/
+  allowed_domains:
+  - parasdefence.com
+  - www.parasdefence.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ZENTECHNOLOGIES-COM
+  name: zentechnologies.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.zentechnologies.com/
+  allowed_domains:
+  - zentechnologies.com
+  - www.zentechnologies.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-PELGEL-COM
+  name: pelgel.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.pelgel.com/
+  allowed_domains:
+  - pelgel.com
+  - www.pelgel.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-TATATECHNOLOGIES-COM
+  name: tatatechnologies.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.tatatechnologies.com/
+  allowed_domains:
+  - tatatechnologies.com
+  - www.tatatechnologies.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ANANTHTECH-COM
+  name: ananthtech.com
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://ananthtech.com/
+  allowed_domains:
+  - ananthtech.com
+  - www.ananthtech.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NSILINDIA-CO-IN
+  name: nsilindia.co.in
+  sector:
+  - DEFENCE_PRIVATE
+  source_class: OTHER
+  base_url: https://www.nsilindia.co.in/
+  allowed_domains:
+  - nsilindia.co.in
+  - www.nsilindia.co.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AIRINDIA-COM
+  name: airindia.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.airindia.com/
+  allowed_domains:
+  - airindia.com
+  - www.airindia.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GOINDIGO-IN
+  name: goindigo.in
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.goindigo.in/
+  allowed_domains:
+  - goindigo.in
+  - www.goindigo.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AKASAAIR-COM
+  name: akasaair.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.akasaair.com/
+  allowed_domains:
+  - akasaair.com
+  - www.akasaair.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SPICEJET-COM
+  name: spicejet.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.spicejet.com/
+  allowed_domains:
+  - spicejet.com
+  - www.spicejet.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ALLIANCEAIR-IN
+  name: allianceair.in
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.allianceair.in/
+  allowed_domains:
+  - allianceair.in
+  - www.allianceair.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BOEING-COM
+  name: boeing.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.boeing.com/
+  allowed_domains:
+  - boeing.com
+  - www.boeing.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AIRBUS-COM
+  name: airbus.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.airbus.com/
+  allowed_domains:
+  - airbus.com
+  - www.airbus.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-LOCKHEEDMARTIN-COM
+  name: lockheedmartin.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.lockheedmartin.com/
+  allowed_domains:
+  - lockheedmartin.com
+  - www.lockheedmartin.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EMBRAER-COM
+  name: embraer.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.embraer.com/
+  allowed_domains:
+  - embraer.com
+  - www.embraer.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DASSAULT-AVIATION-COM
+  name: dassault-aviation.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.dassault-aviation.com/
+  allowed_domains:
+  - dassault-aviation.com
+  - www.dassault-aviation.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-LEONARDO-COM
+  name: leonardo.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.leonardo.com/
+  allowed_domains:
+  - leonardo.com
+  - www.leonardo.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SAAB-COM
+  name: saab.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.saab.com/
+  allowed_domains:
+  - saab.com
+  - www.saab.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GEAEROSPACE-COM
+  name: geaerospace.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.geaerospace.com/
+  allowed_domains:
+  - geaerospace.com
+  - www.geaerospace.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-RTX-COM
+  name: rtx.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.rtx.com/
+  allowed_domains:
+  - rtx.com
+  - www.rtx.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-PRATTWHITNEY-COM
+  name: prattwhitney.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.prattwhitney.com/
+  allowed_domains:
+  - prattwhitney.com
+  - www.prattwhitney.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ROLLS-ROYCE-COM
+  name: rolls-royce.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.rolls-royce.com/
+  allowed_domains:
+  - rolls-royce.com
+  - www.rolls-royce.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SAFRAN-GROUP-COM
+  name: safran-group.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.safran-group.com/
+  allowed_domains:
+  - safran-group.com
+  - www.safran-group.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FLIGHTGLOBAL-COM
+  name: flightglobal.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.flightglobal.com/
+  allowed_domains:
+  - flightglobal.com
+  - www.flightglobal.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AVIATIONWEEK-COM
+  name: aviationweek.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://aviationweek.com/
+  allowed_domains:
+  - aviationweek.com
+  - www.aviationweek.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SIMPLEFLYING-COM
+  name: simpleflying.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://simpleflying.com/
+  allowed_domains:
+  - simpleflying.com
+  - www.simpleflying.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AIRLINERATINGS-COM
+  name: airlineratings.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.airlineratings.com/
+  allowed_domains:
+  - airlineratings.com
+  - www.airlineratings.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FLIGHTRADAR24-COM
+  name: flightradar24.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.flightradar24.com/
+  allowed_domains:
+  - flightradar24.com
+  - www.flightradar24.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FLIGHTAWARE-COM
+  name: flightaware.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.flightaware.com/
+  allowed_domains:
+  - flightaware.com
+  - www.flightaware.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-RADARBOX-COM
+  name: radarbox.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.radarbox.com/
+  allowed_domains:
+  - radarbox.com
+  - www.radarbox.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AIRPORT-TECHNOLOGY-COM
+  name: airport-technology.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.airport-technology.com/
+  allowed_domains:
+  - airport-technology.com
+  - www.airport-technology.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AIRPORT-WORLD-COM
+  name: airport-world.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://airport-world.com/
+  allowed_domains:
+  - airport-world.com
+  - www.airport-world.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-CENTREFORAVIATION-COM
+  name: centreforaviation.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://centreforaviation.com/
+  allowed_domains:
+  - centreforaviation.com
+  - www.centreforaviation.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-IATA-ORG
+  name: iata.org
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.iata.org/
+  allowed_domains:
+  - iata.org
+  - www.iata.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ICAO-INT
+  name: icao.int
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.icao.int/
+  allowed_domains:
+  - icao.int
+  - www.icao.int
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EASA-EUROPA-EU
+  name: easa.europa.eu
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.easa.europa.eu/
+  allowed_domains:
+  - easa.europa.eu
+  - www.easa.europa.eu
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FAA-GOV
+  name: faa.gov
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.faa.gov/
+  allowed_domains:
+  - faa.gov
+  - www.faa.gov
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EUROCONTROL-INT
+  name: eurocontrol.int
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.eurocontrol.int/
+  allowed_domains:
+  - eurocontrol.int
+  - www.eurocontrol.int
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ACI-AERO
+  name: aci.aero
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://aci.aero/
+  allowed_domains:
+  - aci.aero
+  - www.aci.aero
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ACI-ASIAPAC-AERO
+  name: aci-asiapac.aero
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.aci-asiapac.aero/
+  allowed_domains:
+  - aci-asiapac.aero
+  - www.aci-asiapac.aero
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-TXTAV-COM
+  name: txtav.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://txtav.com/
+  allowed_domains:
+  - txtav.com
+  - www.txtav.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GULFSTREAM-COM
+  name: gulfstream.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.gulfstream.com/
+  allowed_domains:
+  - gulfstream.com
+  - www.gulfstream.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BOMBARDIER-COM
+  name: bombardier.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://bombardier.com/
+  allowed_domains:
+  - bombardier.com
+  - www.bombardier.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ATR-AIRCRAFT-COM
+  name: atr-aircraft.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.atr-aircraft.com/
+  allowed_domains:
+  - atr-aircraft.com
+  - www.atr-aircraft.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ENGLISH-COMAC-CC
+  name: english.comac.cc
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://english.comac.cc/
+  allowed_domains:
+  - english.comac.cc
+  - www.english.comac.cc
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BELLFLIGHT-COM
+  name: bellflight.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.bellflight.com/
+  allowed_domains:
+  - bellflight.com
+  - www.bellflight.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-VERTICAL-AEROSPACE-COM
+  name: vertical-aerospace.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://vertical-aerospace.com/
+  allowed_domains:
+  - vertical-aerospace.com
+  - www.vertical-aerospace.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-JOBYAVIATION-COM
+  name: jobyaviation.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.jobyaviation.com/
+  allowed_domains:
+  - jobyaviation.com
+  - www.jobyaviation.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ARCHER-COM
+  name: archer.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.archer.com/
+  allowed_domains:
+  - archer.com
+  - www.archer.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BOOMSUPERSONIC-COM
+  name: boomsupersonic.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://boomsupersonic.com/
+  allowed_domains:
+  - boomsupersonic.com
+  - www.boomsupersonic.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AINONLINE-COM
+  name: ainonline.com
+  sector:
+  - AVIATION
+  source_class: OTHER
+  base_url: https://www.ainonline.com/
+  allowed_domains:
+  - ainonline.com
+  - www.ainonline.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FINCANTIERI-COM
+  name: fincantieri.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.fincantieri.com/
+  allowed_domains:
+  - fincantieri.com
+  - www.fincantieri.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NAVAL-GROUP-COM
+  name: naval-group.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.naval-group.com/
+  allowed_domains:
+  - naval-group.com
+  - www.naval-group.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BAESYSTEMS-COM
+  name: baesystems.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.baesystems.com/
+  allowed_domains:
+  - baesystems.com
+  - www.baesystems.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-HII-COM
+  name: hii.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://hii.com/
+  allowed_domains:
+  - hii.com
+  - www.hii.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DAMEN-COM
+  name: damen.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.damen.com/
+  allowed_domains:
+  - damen.com
+  - www.damen.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AUSTAL-COM
+  name: austal.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.austal.com/
+  allowed_domains:
+  - austal.com
+  - www.austal.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NAVANTIA-ES
+  name: navantia.es
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.navantia.es/
+  allowed_domains:
+  - navantia.es
+  - www.navantia.es
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-THYSSENKRUPP-MARINESYSTEMS-COM
+  name: thyssenkrupp-marinesystems.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.thyssenkrupp-marinesystems.com/
+  allowed_domains:
+  - thyssenkrupp-marinesystems.com
+  - www.thyssenkrupp-marinesystems.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-HD-COM
+  name: hd.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.hd.com/
+  allowed_domains:
+  - hd.com
+  - www.hd.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-HANWHAOCEAN-COM
+  name: hanwhaocean.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.hanwhaocean.com/
+  allowed_domains:
+  - hanwhaocean.com
+  - www.hanwhaocean.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-CSSC-NET-CN
+  name: cssc.net.cn
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.cssc.net.cn/
+  allowed_domains:
+  - cssc.net.cn
+  - www.cssc.net.cn
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NAVALNEWS-COM
+  name: navalnews.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.navalnews.com/
+  allowed_domains:
+  - navalnews.com
+  - www.navalnews.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NEWS-USNI-ORG
+  name: news.usni.org
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://news.usni.org/
+  allowed_domains:
+  - news.usni.org
+  - www.news.usni.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NAVAL-TECHNOLOGY-COM
+  name: naval-technology.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.naval-technology.com/
+  allowed_domains:
+  - naval-technology.com
+  - www.naval-technology.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MARINELINK-COM
+  name: marinelink.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.marinelink.com/
+  allowed_domains:
+  - marinelink.com
+  - www.marinelink.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MARITIME-EXECUTIVE-COM
+  name: maritime-executive.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.maritime-executive.com/
+  allowed_domains:
+  - maritime-executive.com
+  - www.maritime-executive.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GCAPTAIN-COM
+  name: gcaptain.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://gcaptain.com/
+  allowed_domains:
+  - gcaptain.com
+  - www.gcaptain.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SEATRADE-MARITIME-COM
+  name: seatrade-maritime.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.seatrade-maritime.com/
+  allowed_domains:
+  - seatrade-maritime.com
+  - www.seatrade-maritime.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SPLASH247-COM
+  name: splash247.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://splash247.com/
+  allowed_domains:
+  - splash247.com
+  - www.splash247.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-TRADEWINDSNEWS-COM
+  name: tradewindsnews.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.tradewindsnews.com/
+  allowed_domains:
+  - tradewindsnews.com
+  - www.tradewindsnews.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-LLOYDSLIST-COM
+  name: lloydslist.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.lloydslist.com/
+  allowed_domains:
+  - lloydslist.com
+  - www.lloydslist.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-IMO-ORG
+  name: imo.org
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.imo.org/
+  allowed_domains:
+  - imo.org
+  - www.imo.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-IHO-INT
+  name: iho.int
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://iho.int/
+  allowed_domains:
+  - iho.int
+  - www.iho.int
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EMSA-EUROPA-EU
+  name: emsa.europa.eu
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.emsa.europa.eu/
+  allowed_domains:
+  - emsa.europa.eu
+  - www.emsa.europa.eu
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-USCG-MIL
+  name: uscg.mil
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.uscg.mil/
+  allowed_domains:
+  - uscg.mil
+  - www.uscg.mil
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-OCEANSERVICE-NOAA-GOV
+  name: oceanservice.noaa.gov
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://oceanservice.noaa.gov/
+  allowed_domains:
+  - oceanservice.noaa.gov
+  - www.oceanservice.noaa.gov
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MARINETRAFFIC-COM
+  name: marinetraffic.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.marinetraffic.com/
+  allowed_domains:
+  - marinetraffic.com
+  - www.marinetraffic.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-VESSELFINDER-COM
+  name: vesselfinder.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.vesselfinder.com/
+  allowed_domains:
+  - vesselfinder.com
+  - www.vesselfinder.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FLEETMON-COM
+  name: fleetmon.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.fleetmon.com/
+  allowed_domains:
+  - fleetmon.com
+  - www.fleetmon.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EQUASIS-ORG
+  name: equasis.org
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.equasis.org/
+  allowed_domains:
+  - equasis.org
+  - www.equasis.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-UNCTAD-ORG-TOPIC-TRANSPORT-AND-TRADE-LOGISTICS
+  name: unctad.org/transport
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://unctad.org/topic/transport-and-trade-logistics
+  allowed_domains:
+  - unctad.org
+  - www.unctad.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-WORLDSHIPPING-ORG
+  name: worldshipping.org
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.worldshipping.org/
+  allowed_domains:
+  - worldshipping.org
+  - www.worldshipping.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BIMCO-ORG
+  name: bimco.org
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.bimco.org/
+  allowed_domains:
+  - bimco.org
+  - www.bimco.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INTERCARGO-ORG
+  name: intercargo.org
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.intercargo.org/
+  allowed_domains:
+  - intercargo.org
+  - www.intercargo.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INTERTANKO-COM
+  name: intertanko.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.intertanko.com/
+  allowed_domains:
+  - intertanko.com
+  - www.intertanko.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ICS-SHIPPING-ORG
+  name: ics-shipping.org
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.ics-shipping.org/
+  allowed_domains:
+  - ics-shipping.org
+  - www.ics-shipping.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MPA-GOV-SG
+  name: mpa.gov.sg
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.mpa.gov.sg/
+  allowed_domains:
+  - mpa.gov.sg
+  - www.mpa.gov.sg
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-PORTOFROTTERDAM-COM
+  name: portofrotterdam.com
+  sector:
+  - MARITIME_NAVAL
+  source_class: OTHER
+  base_url: https://www.portofrotterdam.com/
+  allowed_domains:
+  - portofrotterdam.com
+  - www.portofrotterdam.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GLOBALPSA-COM
+  name: globalpsa.com
+  sector:
+  - MARITIME_NAVAL
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.globalpsa.com/
+  allowed_domains:
+  - globalpsa.com
+  - www.globalpsa.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DHL-COM
+  name: dhl.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.dhl.com/
+  allowed_domains:
+  - dhl.com
+  - www.dhl.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FEDEX-COM
+  name: fedex.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.fedex.com/
+  allowed_domains:
+  - fedex.com
+  - www.fedex.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-UPS-COM
+  name: ups.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.ups.com/
+  allowed_domains:
+  - ups.com
+  - www.ups.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MAERSK-COM
+  name: maersk.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.maersk.com/
+  allowed_domains:
+  - maersk.com
+  - www.maersk.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-MSC-COM
+  name: msc.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.msc.com/
+  allowed_domains:
+  - msc.com
+  - www.msc.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-CMA-CGM-COM
+  name: cma-cgm.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.cma-cgm.com/
+  allowed_domains:
+  - cma-cgm.com
+  - www.cma-cgm.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-HAPAG-LLOYD-COM
+  name: hapag-lloyd.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.hapag-lloyd.com/
+  allowed_domains:
+  - hapag-lloyd.com
+  - www.hapag-lloyd.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ONE-LINE-COM
+  name: one-line.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.one-line.com/
+  allowed_domains:
+  - one-line.com
+  - www.one-line.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EVERGREEN-MARINE-COM
+  name: evergreen-marine.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.evergreen-marine.com/
+  allowed_domains:
+  - evergreen-marine.com
+  - www.evergreen-marine.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-LINES-COSCOSHIPPING-COM
+  name: lines.coscoshipping.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://lines.coscoshipping.com/
+  allowed_domains:
+  - lines.coscoshipping.com
+  - www.lines.coscoshipping.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-YANGMING-COM
+  name: yangming.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.yangming.com/
+  allowed_domains:
+  - yangming.com
+  - www.yangming.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-HMM21-COM
+  name: hmm21.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.hmm21.com/
+  allowed_domains:
+  - hmm21.com
+  - www.hmm21.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ZIM-COM
+  name: zim.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.zim.com/
+  allowed_domains:
+  - zim.com
+  - www.zim.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DPWORLD-COM
+  name: dpworld.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.dpworld.com/
+  allowed_domains:
+  - dpworld.com
+  - www.dpworld.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-HOME-KUEHNE-NAGEL-COM
+  name: kuehne-nagel.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://home.kuehne-nagel.com/
+  allowed_domains:
+  - home.kuehne-nagel.com
+  - www.home.kuehne-nagel.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DBSCHENKER-COM
+  name: dbschenker.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.dbschenker.com/
+  allowed_domains:
+  - dbschenker.com
+  - www.dbschenker.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DSV-COM
+  name: dsv.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.dsv.com/
+  allowed_domains:
+  - dsv.com
+  - www.dsv.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-EXPEDITORS-COM
+  name: expeditors.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.expeditors.com/
+  allowed_domains:
+  - expeditors.com
+  - www.expeditors.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-NIPPONEXPRESS-COM
+  name: nipponexpress.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.nipponexpress.com/
+  allowed_domains:
+  - nipponexpress.com
+  - www.nipponexpress.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-CEVALOGISTICS-COM
+  name: cevalogistics.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.cevalogistics.com/
+  allowed_domains:
+  - cevalogistics.com
+  - www.cevalogistics.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BOLLORE-LOGISTICS-COM
+  name: bollore-logistics.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.bollore-logistics.com/
+  allowed_domains:
+  - bollore-logistics.com
+  - www.bollore-logistics.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-AGILITY-COM
+  name: agility.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.agility.com/
+  allowed_domains:
+  - agility.com
+  - www.agility.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-DELHIVERY-COM
+  name: delhivery.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.delhivery.com/
+  allowed_domains:
+  - delhivery.com
+  - www.delhivery.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BLUEDART-COM
+  name: bluedart.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.bluedart.com/
+  allowed_domains:
+  - bluedart.com
+  - www.bluedart.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ECOMEXPRESS-IN
+  name: ecomexpress.in
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.ecomexpress.in/
+  allowed_domains:
+  - ecomexpress.in
+  - www.ecomexpress.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SAFEXPRESS-COM
+  name: safexpress.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.safexpress.com/
+  allowed_domains:
+  - safexpress.com
+  - www.safexpress.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ALLCARGOLOGISTICS-COM
+  name: allcargologistics.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.allcargologistics.com/
+  allowed_domains:
+  - allcargologistics.com
+  - www.allcargologistics.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-VRLLOGISTICS-COM
+  name: vrllogistics.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.vrllogistics.com/
+  allowed_domains:
+  - vrllogistics.com
+  - www.vrllogistics.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-CONCORINDIA-CO-IN
+  name: concorindia.co.in
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.concorindia.co.in/
+  allowed_domains:
+  - concorindia.co.in
+  - www.concorindia.co.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-APMTERMINALS-COM
+  name: apmterminals.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.apmterminals.com/
+  allowed_domains:
+  - apmterminals.com
+  - www.apmterminals.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-HUTCHISONPORTS-COM
+  name: hutchisonports.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.hutchisonports.com/
+  allowed_domains:
+  - hutchisonports.com
+  - www.hutchisonports.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ADANIPORTS-COM
+  name: adaniports.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.adaniports.com/
+  allowed_domains:
+  - adaniports.com
+  - www.adaniports.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-JSW-IN-INFRASTRUCTURE
+  name: jsw.in/infrastructure
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.jsw.in/infrastructure
+  allowed_domains:
+  - jsw.in
+  - www.jsw.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-GATEWAY-DISTRIPARKS-COM
+  name: gateway-distriparks.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.gateway-distriparks.com/
+  allowed_domains:
+  - gateway-distriparks.com
+  - www.gateway-distriparks.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SNOWMAN-IN
+  name: snowman.in
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.snowman.in/
+  allowed_domains:
+  - snowman.in
+  - www.snowman.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-LOADSHARE-NET
+  name: loadshare.net
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://loadshare.net/
+  allowed_domains:
+  - loadshare.net
+  - www.loadshare.net
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-BLACKBUCK-COM
+  name: blackbuck.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.blackbuck.com/
+  allowed_domains:
+  - blackbuck.com
+  - www.blackbuck.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-PORTER-IN
+  name: porter.in
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://porter.in/
+  allowed_domains:
+  - porter.in
+  - www.porter.in
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-RIVIGO-COM
+  name: rivigo.com
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.rivigo.com/
+  allowed_domains:
+  - rivigo.com
+  - www.rivigo.com
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-FIATA-ORG
+  name: fiata.org
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://fiata.org/
+  allowed_domains:
+  - fiata.org
+  - www.fiata.org
+  enabled: true
+  preferred_adapter: WEB
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: false
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-WCOOMD-ORG
+  name: wcoomd.org
+  sector:
+  - CARGO_LOGISTICS
+  source_class: OTHER
+  base_url: https://www.wcoomd.org/
+  allowed_domains:
+  - wcoomd.org
+  - www.wcoomd.org
   enabled: true
   preferred_adapter: WEB
   fallback_adapter: WEB

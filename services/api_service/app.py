@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException, Security, Depends
 from fastapi.security.api_key import APIKeyHeader
-from services.shared.redis_client import ping_redis, get_redis_client
-from services.shared.redis_metrics import RedisMetrics
-from services.shared.redis_queue import RedisQueue
-from services.shared.url_frontier import UrlFrontier
-from services.common.security import is_safe_url
+from services.storage.shared.redis_client import ping_redis, get_redis_client
+from services.storage.shared.redis_metrics import RedisMetrics
+from services.storage.shared.redis_queue import RedisQueue
+from services.storage.shared.url_frontier import UrlFrontier
+from services.storage.common.security import is_safe_url
 import os
 
 API_KEY_NAME = "X-API-Key"

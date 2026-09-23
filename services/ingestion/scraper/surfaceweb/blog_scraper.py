@@ -2,9 +2,9 @@ import json
 import re
 from urllib.parse import urlparse
 
-from services.common.text_cleaner import clean_text
-from services.common.date_time import parse_date
-from services.scraper.extractors.blog_extractor import BlogExtractor
+from services.storage.common.text_cleaner import clean_text
+from services.storage.common.date_time import parse_date
+from services.ingestion.scraper.extractors.blog_extractor import BlogExtractor
 
 
 class BlogScraper:

@@ -56,9 +56,19 @@ SimHash blocking, MinHash/LSH, conservative similarity decisions, lineage/attrib
 - Hardened HTTP reads to stream and enforce response-size limits before buffering; bounded API lists, scheduler work, and representative scans.
 - Docker Compose syntax is valid, but Docker daemon access is unavailable in this environment, so image build/start could not run.
 - Added `backend/requirements.txt` so Docker installs only the active Layer 1–5 stack; legacy crawler/ML packages remain isolated in the root requirements for legacy services.
-- Added compatibility package paths for legacy `services.common`, `services.shared`, `services.scraper`, `services.parser`, and `services.crawlers` imports without duplicating implementation modules.
+- Consolidated crawler imports on the existing canonical `services.ingestion.crawlers` and `services.ingestion.scraper` packages; removed obsolete top-level compatibility aliases and generated embedded environments.
 - Optional Scrapy-based tests now skip cleanly when the legacy crawler dependencies are not installed in the minimal backend environment.
 - Removed the unnecessary `python-dotenv` runtime dependency from the active Redis helper; environment variables are read directly.
-- Full repository pytest collection: 8 passed, 2 skipped, 4 deprecation warnings.
-- Compileall, frontend lint, Docker Compose config, and compatibility imports pass. Docker image build remains unverified because the Docker daemon is unavailable.
+- Full repository pytest collection: 9 passed, 2 skipped, 4 deprecation warnings. Removed the obsolete root Kafka smoke test instead of restoring the out-of-scope Kafka dependency to the active stack.
+- Compileall, frontend lint, Docker Compose config, and canonical imports pass. Docker image build remains unverified because the Docker daemon is unavailable.
 - Frontend production build passes with the stable Webpack builder; Next tracing is pinned to the frontend workspace root.
+- Native runtime verified with SQLite: `backend/run.py` starts Uvicorn, `/health` returns 200, and registration returns a JWT. Frontend production server returned 200 for `/` and `/watchlists`.
+- Local RSS fixture collection verified: one entry parsed, ETag/Last-Modified checkpoint produced, SHA-256 generated, and raw evidence written to the local object-store fallback.
+- `run_tests.sh` now runs offline checks and reports optional Scrapy live runs as skipped instead of failing when Scrapy is absent.
+- Live registry smoke run completed for all 3 configured base URLs and 2 discovered RSS feeds using bounded SSRF-validated HTTP; raw bytes were hashed and written to `/tmp/trinetra-live-evidence`.
+- RSS discovery now deduplicates feeds by final URL when the same feed is found through HTML and conventional paths.
+- Added `scripts/audit_source_registry.py` for bounded robots-aware collection and JSON reporting across every enabled manifest URL; current live report: 3/3 collected, 2 RSS feeds, 35 entries, 0 failures.
+- Expanded `docs/source_registry.md` from 3 to 218 parsed links from the supplied government, defence/aerospace, aviation, maritime/naval, and cargo/logistics lists; canonical manifest contains 217 unique sources with no duplicate IDs or base URLs.
+- Full 217-source base audit completed with 167 collected, 34 transport/configuration failures, 12 HTTP-forbidden responses, and 4 robots/policy blocks. Report: `artifacts/source_audit_217_final.json`.
+- Importer now merges www/non-www source variants and emits both explicit approved host variants for redirect validation; transient audit network errors retry three times with bounded backoff.
+- Registry audit artifacts are ignored by Git; canonical source manifest remains the version-controlled seed.

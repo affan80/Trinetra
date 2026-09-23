@@ -1,4 +1,4 @@
-from services.shared.neo4j_client import get_neo4j_driver
+from services.storage.shared.neo4j_client import get_neo4j_driver
 
 
 def load_article(article: dict):

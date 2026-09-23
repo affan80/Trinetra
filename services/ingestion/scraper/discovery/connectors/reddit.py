@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from services.scraper.discovery import UrlCandidate
-from services.scraper.discovery.connectors.base import HttpDiscoveryConnector
+from services.ingestion.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.discovery.connectors.base import HttpDiscoveryConnector
 
 
 class RedditConnector(HttpDiscoveryConnector):

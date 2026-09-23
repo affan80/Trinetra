@@ -47,7 +47,19 @@ echo ""
 echo "----------------------------------------------------------------------"
 echo "🧪 RUNNING: offline scraper checks"
 echo "----------------------------------------------------------------------"
+set +e
 "$VENV_PYTHON" -m pytest tests/smoke tests/scraper
+OFFLINE_STATUS=$?
+set -e
+if [ "$OFFLINE_STATUS" -ne 0 ] && [ "$OFFLINE_STATUS" -ne 5 ]; then
+    exit "$OFFLINE_STATUS"
+fi
+
+if ! command -v "$SCRAPY" >/dev/null 2>&1; then
+    echo "⚠️  Scrapy is not installed; legacy live spider runs are skipped."
+    echo "   Install requirements.txt to enable the optional legacy crawler stack."
+    exit 0
+fi
 
 for ENTRY in "${SPIDERS[@]}"; do
     # Split the entry into path and args

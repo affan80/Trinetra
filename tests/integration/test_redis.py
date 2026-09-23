@@ -3,13 +3,13 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from services.shared.redis_client import ping_redis
-from services.shared.redis_dedupe import RedisDedupe
-from services.shared.redis_queue import RedisQueue
-from services.shared.redis_metrics import RedisMetrics
-from services.shared.redis_cache import RedisCache
-from services.shared.redis_locks import redis_lock
-from services.shared.url_frontier import UrlFrontier
+from services.storage.shared.redis_client import ping_redis
+from services.storage.shared.redis_dedupe import RedisDedupe
+from services.storage.shared.redis_queue import RedisQueue
+from services.storage.shared.redis_metrics import RedisMetrics
+from services.storage.shared.redis_cache import RedisCache
+from services.storage.shared.redis_locks import redis_lock
+from services.storage.shared.url_frontier import UrlFrontier
 
 
 def main():

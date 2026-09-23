@@ -94,6 +94,8 @@ artifacts/**/*.jsonl
 artifacts/**/*.log
 artifacts/test_output/
 artifacts/scraping/
+artifacts/source_audit.json
+artifacts/source_audit_*.json
 
 # Temporary planning notes
 docs/scraping/temp/

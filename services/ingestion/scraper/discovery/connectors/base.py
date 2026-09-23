@@ -7,7 +7,7 @@ from typing import Any
 
 import requests
 
-from services.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.discovery import UrlCandidate
 
 
 def env_int(name: str, default: int) -> int:

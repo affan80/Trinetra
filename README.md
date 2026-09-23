@@ -229,6 +229,16 @@ python scripts/discover_rss.py --sector NEWS --limit 20
 python scripts/discover_rss.py --all-enabled --limit 20
 ~~~
 
+Audit and preserve every enabled registry base URL, including discovered RSS feeds:
+
+~~~bash
+PYTHONPATH=. python scripts/audit_source_registry.py --rss
+~~~
+
+The command writes `artifacts/source_audit.json` and content-addressed raw objects under `/tmp/trinetra-registry-evidence` by default. It checks robots policy, uses the hardened SSRF-aware client, caps workers, and records failures without aborting the full run.
+
+The current supplied registry contains 218 parsed links, merged into 217 unique canonical sources (one duplicate merged; no invalid or missing URLs). The latest bounded audit result is recorded in `artifacts/source_audit_217_final.json`: 167 collected, 12 HTTP-forbidden, 4 robots/policy blocked, and 34 transport/configuration failures. Forbidden, robots-blocked, TLS, DNS, timeout, oversized-response, and unapproved-redirect results are reported rather than bypassed.
+
 Tests use local RSS and autodiscovery fixtures. Check robots and usage policies before broad discovery against third-party sites.
 
 ## Local development

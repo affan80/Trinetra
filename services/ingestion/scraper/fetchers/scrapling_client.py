@@ -1,7 +1,7 @@
 import time
 
-from services.scraper.config import get_scrapling_settings
-from services.scraper.fetchers.fetch_result import FetchResult
+from services.ingestion.scraper.config import get_scrapling_settings
+from services.ingestion.scraper.fetchers.fetch_result import FetchResult
 
 
 class ScraplingFetchClient:

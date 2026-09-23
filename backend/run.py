@@ -1,5 +1,11 @@
-from app import create_app
-app = create_app()
+import os
+
+import uvicorn
 
 if __name__ == "__main__":
-    app.run()
+    uvicorn.run(
+        "backend.app.main:app",
+        host=os.getenv("HOST", "127.0.0.1"),
+        port=int(os.getenv("PORT", "8000")),
+        reload=False,
+    )

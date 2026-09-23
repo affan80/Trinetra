@@ -5,15 +5,15 @@ from urllib.parse import urlparse
 
 import scrapy
 
-from services.common.items import BlogItem, ImageItem, NewsItem
-from services.scraper.discovery import UrlCandidate
-from services.scraper.fetchers import ScraplingFetchClient
-from services.scraper.policy import FetchPolicy, SourcePolicy
-from services.scraper.surfaceweb.blog_scraper import BlogScraper
-from services.scraper.surfaceweb.image_scraper import ImageScraper
-from services.scraper.surfaceweb.news_scraper import NewsScraper
-from services.shared.redis_metrics import RedisMetrics
-from services.shared.url_frontier import UrlFrontier
+from services.storage.common.items import BlogItem, ImageItem, NewsItem
+from services.ingestion.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.fetchers import ScraplingFetchClient
+from services.ingestion.scraper.policy import FetchPolicy, SourcePolicy
+from services.ingestion.scraper.surfaceweb.blog_scraper import BlogScraper
+from services.ingestion.scraper.surfaceweb.image_scraper import ImageScraper
+from services.ingestion.scraper.surfaceweb.news_scraper import NewsScraper
+from services.storage.shared.redis_metrics import RedisMetrics
+from services.storage.shared.url_frontier import UrlFrontier
 
 
 class FrontierSpider(scrapy.Spider):

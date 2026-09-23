@@ -5,8 +5,8 @@ import json
 import os
 from typing import Iterable
 
-from services.scraper.discovery import UrlCandidate
-from services.scraper.discovery.connectors import (
+from services.ingestion.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.discovery.connectors import (
     BraveSearchConnector,
     CommonCrawlConnector,
     GdeltConnector,
@@ -15,9 +15,9 @@ from services.scraper.discovery.connectors import (
     SitemapConnector,
     YouTubeConnector,
 )
-from services.scraper.policy import SourceRegistry
-from services.shared.redis_metrics import RedisMetrics
-from services.shared.url_frontier import FRONTIER_METRICS, UrlFrontier
+from services.ingestion.scraper.policy import SourceRegistry
+from services.storage.shared.redis_metrics import RedisMetrics
+from services.storage.shared.url_frontier import FRONTIER_METRICS, UrlFrontier
 
 
 DEFAULT_CONNECTORS = ["rss", "sitemap"]

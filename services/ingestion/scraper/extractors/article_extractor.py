@@ -1,8 +1,8 @@
 import json
 
-from services.common.date_time import parse_date
-from services.common.text_cleaner import clean_text
-from services.scraper.extractors.base import ScraplingExtractor
+from services.storage.common.date_time import parse_date
+from services.storage.common.text_cleaner import clean_text
+from services.ingestion.scraper.extractors.base import ScraplingExtractor
 
 
 class ArticleExtractor(ScraplingExtractor):

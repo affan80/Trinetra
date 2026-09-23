@@ -5,7 +5,7 @@ import os
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 
-from services.scraper.discovery import UrlCandidate
+from services.ingestion.scraper.discovery import UrlCandidate
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 DEFAULT_REGISTRY_PATH = os.getenv(
