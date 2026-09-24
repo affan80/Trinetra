@@ -1,4 +1,5 @@
 import feedparser
+import httpx
 from urllib.parse import urljoin, urlsplit
 from backend.app.security.http_client import fetch
 
@@ -10,10 +11,10 @@ def valid_feed(body: bytes) -> tuple[bool, str | None]:
     kind = "atom" if parsed.version and "atom" in parsed.version.lower() else "rss"
     return bool(parsed.entries or parsed.feed), kind
 
-def discover(base_url: str, allowed_domains: list[str], *, fetcher=fetch) -> list[dict]:
+def discover(base_url: str, allowed_domains: list[str], *, fetcher=fetch, allowed_url=None, home_body: bytes | None = None) -> list[dict]:
     candidates = []
-    home = fetcher(base_url, allowed_domains)
-    text = home.body.decode("utf-8", errors="ignore")
+    body = home_body if home_body is not None else fetcher(base_url, allowed_domains).body
+    text = body.decode("utf-8", errors="ignore")
     for match in __import__("re").finditer(r'<link[^>]+(?:type=["\']application/(?:rss|atom)\+xml["\'])[^>]+>', text, __import__("re").I):
         href = __import__("re").search(r'href=["\']([^"\']+)', match.group(0), __import__("re").I)
         if href: candidates.append(urljoin(base_url, href.group(1)))
@@ -25,9 +26,10 @@ def discover(base_url: str, allowed_domains: list[str], *, fetcher=fetch) -> lis
         if candidate in seen or urlsplit(candidate).hostname not in allowed_domains: continue
         seen.add(candidate)
         try:
+            if allowed_url and not allowed_url(candidate): continue
             response = fetcher(candidate, allowed_domains, max_bytes=10 * 1024 * 1024); ok, kind = valid_feed(response.body)
             if ok and response.final_url not in found_urls:
                 found_urls.add(response.final_url)
                 found.append({"rss_url": response.final_url, "rss_type": kind, "validation_status": "VALID", "discovery_method": "html_link" if candidate not in [urljoin(base_url, p) for p in FEED_PATHS] else "conventional_path"})
-        except (ValueError, OSError): continue
+        except (ValueError, OSError, httpx.RequestError): continue
     return found

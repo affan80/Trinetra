@@ -4,17 +4,11 @@ from datetime import datetime, timezone
 from sqlalchemy import JSON, Boolean, DateTime, Enum, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.app.db.database import Base
+from backend.app.db.enums import EntityType, KeywordKind, Priority, Role, WatchlistStatus
 
 
 def now(): return datetime.now(timezone.utc)
 def uid(): return uuid.uuid4()
-
-
-class Role(str, enum.Enum): ADMIN = "ADMIN"; ANALYST = "ANALYST"; VIEWER = "VIEWER"
-class Priority(str, enum.Enum): LOW = "LOW"; MEDIUM = "MEDIUM"; HIGH = "HIGH"; CRITICAL = "CRITICAL"
-class WatchlistStatus(str, enum.Enum): DRAFT = "DRAFT"; VALIDATED = "VALIDATED"; ACTIVE = "ACTIVE"; PAUSED = "PAUSED"; ERROR = "ERROR"; ARCHIVED = "ARCHIVED"
-class EntityType(str, enum.Enum): PERSON="PERSON"; ORGANISATION="ORGANISATION"; LOCATION="LOCATION"; ASSET="ASSET"; FACILITY="FACILITY"; SYSTEM="SYSTEM"; EVENT="EVENT"; OTHER="OTHER"
-class KeywordKind(str, enum.Enum): INCLUDE="INCLUDE"; EXCLUDE="EXCLUDE"
 
 
 class User(Base):

@@ -23,15 +23,16 @@ Implemented:
 - JWT authentication with ADMIN, ANALYST, and VIEWER access control.
 - Watchlist CRUD, lifecycle validation, deterministic requirement parsing, query expansion, and versioned monitoring profiles.
 - Source registry, collection plans, schedules, jobs, Redis handoff, Celery dispatch, retry/rate/checkpoint/health foundations.
-- Hardened HTTP/SSRF validation, RSS discovery fixtures, explicit RSS collection, SHA-256 preservation, MinIO-compatible storage, and provenance records.
+- Hardened HTTP/SSRF validation, RSS discovery fixtures, explicit RSS collection, SHA-256 preservation, persistent local object storage, and provenance records.
 - Layer 5 first slice: canonical record → quality → raw/text fingerprints → exact duplicate lookup → cluster → representative → annotation.
 - Ownership checks for watchlists, plans, jobs, and record endpoints.
+- An analyst overview backed by live counts, recent records, watchlist locations, provenance, activity, and pipeline status.
 
 Current limits:
 
 - Layer 4 is represented by the minimal canonical_records input seam in this checkout.
 - Layer 3 currently exposes the explicit RSS execution path; WEB/API/document/media adapters are incomplete.
-- Layer 5 currently implements exact raw/text deduplication. SimHash, MinHash/LSH, lineage, media fingerprints, and queue routing remain future work.
+- Layer 5 currently implements exact raw/text deduplication and basic record-to-source lineage. SimHash, MinHash/LSH, full provenance visualization, media fingerprints, and queue routing remain future work.
 - Alembic has an initial local scaffold; production migrations still need to replace metadata-based creation.
 
 ## Repository layout
@@ -52,7 +53,7 @@ backend/
   Dockerfile
 
 frontend/
-  pages/                    Next.js pages for watchlists and collection control
+  pages/                    Next.js pages for the overview, watchlists, and collection control
   package.json
 
 config/                     source registry and scraper configuration
@@ -60,7 +61,7 @@ docs/                       source registry and architecture documentation
 scripts/                    source import and RSS discovery commands
 tests/                      Layer 3/5/security and fixture-based tests
 PROJECT_STATE.md            compact implementation state
-docker-compose.yml          local PostgreSQL/Redis/MinIO/API/worker stack
+docker-compose.yml          local PostgreSQL/Redis/API/worker stack
 ~~~
 
 The canonical collection code is under `services/ingestion/`: Scrapy spiders, RSS discovery, fetchers, extractors, and source policy. The old top-level `services/crawlers`, `services/scraper`, `services/common`, and `services/shared` aliases were removed. Layer 1–5 API services remain under `backend/`; legacy Kafka/ML processing is not part of the collector command path.
@@ -94,10 +95,18 @@ Services:
 | frontend | http://localhost:3000 | Next.js UI |
 | postgres | localhost:5432 | System of record |
 | redis | localhost:6379 | Queue/cache handoff |
-| minio | http://localhost:9000 | Raw evidence object storage |
-| MinIO console | http://localhost:9001 | Development storage console |
+| raw_data volume | internal | Content-addressed raw evidence storage |
 | celery | internal | Collection job worker |
 | scheduler | internal | Collection schedule process |
+
+Run the opt-in public-source audit after starting the stack:
+
+~~~bash
+docker compose exec -T backend python scripts/import_source_registry.py --seed
+docker compose run --rm collector
+~~~
+
+The collector checks robots rules, enforces source-domain and response-size limits, stores raw homepage/RSS captures in `raw_data`, and publishes progress to `artifacts/source_audit_live.json`. The authenticated Overview and Collections pages update every 3–10 seconds. Failed or blocked sources are reported rather than silently skipped. This source audit is separate from watchlist collection jobs and does not claim that a fetched page is verified or canonical intelligence.
 
 Development Compose credentials are intentionally local-only. Change them in .env before sharing or deploying.
 
@@ -117,7 +126,7 @@ Stop the stack:
 docker compose down
 ~~~
 
-Named PostgreSQL and MinIO volumes are retained. Reset local data only when intentional:
+Named PostgreSQL and raw-evidence volumes are retained. A legacy MinIO volume is also retained for recovery. Reset local data only when intentional:
 
 ~~~bash
 docker compose down -v
@@ -130,10 +139,7 @@ Copy .env.example to .env:
 ~~~env
 DATABASE_URL=postgresql+psycopg://trinetra:trinetra@postgres:5432/trinetra
 REDIS_URL=redis://redis:6379/0
-MINIO_ENDPOINT=minio:9000
-MINIO_ACCESS_KEY=trinetra
-MINIO_SECRET_KEY=replace-with-a-secret
-MINIO_BUCKET_RAW=raw-evidence
+RAW_OBJECT_ROOT=./data/raw-evidence
 JWT_SECRET=replace-with-a-long-random-secret
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
@@ -205,6 +211,13 @@ GET  /duplicate-clusters/{id}/members
 
 Protected endpoints require a bearer token from registration or login. Non-admin users can access only records and collection resources connected to their own watchlists. VIEWER is read-only.
 
+The Overview UI at `http://localhost:3000` uses the same auth token and a same-origin API proxy. Create an account from the sign-in screen, then create a watchlist with optional coordinates. The map, counts, recent evidence, and lineage show database records only; a new database correctly starts with empty states. The current backend has no investigation or confidence model, so the right panel focuses on a watchlist and record quality is not presented as intelligence confidence.
+
+~~~text
+GET /overview
+GET /overview/lineage/{record_id}
+~~~
+
 ## Typical workflow
 
 1. Register or log in.
@@ -270,7 +283,7 @@ npm ci
 npm run dev
 ~~~
 
-The frontend currently provides basic watchlist and collection-control pages, prioritizing functionality over finished visual design.
+For a local frontend with a separately running API, set `API_INTERNAL_URL=http://127.0.0.1:8000` before `npm run dev`.
 
 ## Local scraper and RSS collection
 

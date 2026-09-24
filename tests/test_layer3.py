@@ -1,5 +1,6 @@
 from pathlib import Path
 from types import SimpleNamespace
+import json
 
 from scripts.import_source_registry import canonical_url, parse_document
 from scripts import audit_source_registry
@@ -7,6 +8,7 @@ from backend.app.collectors.adapters import rss
 from backend.app.security.http_client import sha256
 from backend.app.security.network import resolve_public
 from backend.app.services.object_store import ObjectStore
+from backend.app.services.rss_discovery import discover
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -41,3 +43,27 @@ def test_registry_audit_collects_and_preserves(monkeypatch, tmp_path):
     assert row["status"] == "COLLECTED"
     assert row["sha256"] == sha256(b"evidence")
     assert Path(row["raw_object_uri"].removeprefix("file://")).exists()
+
+
+def test_registry_audit_publishes_progress_without_network(monkeypatch, tmp_path):
+    output = tmp_path / "source_audit_live.json"
+
+    def fake_audit(source, store, include_rss):
+        assert json.loads(output.read_text())["status"] == "RUNNING"
+        return {"id": source["id"], "name": source["id"], "base_url": "https://example.com/",
+                "status": "COLLECTED", "feeds": [{"status": "COLLECTED", "entries": 2}]}
+
+    monkeypatch.setattr(audit_source_registry, "audit_source", fake_audit)
+    report = audit_source_registry.run_audit([{"id": "one"}, {"id": "two"}], ObjectStore(str(tmp_path)), output, 1, True)
+    assert report["status"] == "COMPLETE"
+    assert report["summary"]["completed"] == 2
+    assert report["summary"]["rss_entries"] == 4
+    assert json.loads(output.read_text()) == report
+
+
+def test_rss_discovery_reuses_homepage_and_skips_blocked_paths():
+    def unexpected_fetch(*args, **kwargs):
+        raise AssertionError("blocked RSS path or homepage fetched twice")
+
+    assert discover("https://example.com/", ["example.com"], fetcher=unexpected_fetch,
+                    allowed_url=lambda url: False, home_body=b"<html></html>") == []

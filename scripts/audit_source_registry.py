@@ -3,10 +3,13 @@
 
 import argparse
 import json
+import os
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
+from functools import lru_cache
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 from urllib.robotparser import RobotFileParser
 
 import yaml
@@ -19,7 +22,7 @@ from backend.app.services.rss_discovery import discover
 
 USER_AGENT = "TRINETRA-OSINT-Collector/0.1"
 RETRYABLE_ERRORS = {"gaierror", "ConnectError", "ConnectTimeout", "ReadTimeout", "ReadError", "WriteError", "RemoteProtocolError"}
-RETRYABLE_STATUS = {429, 500, 502, 503, 504}
+RETRYABLE_STATUS = {500, 502, 503, 504}
 
 
 def fetch_with_retry(url: str, domains: list[str], max_bytes: int):
@@ -34,15 +37,22 @@ def fetch_with_retry(url: str, domains: list[str], max_bytes: int):
         time.sleep(0.5 * (attempt + 1))
 
 
-def check_robots(base_url: str, domains: list[str]) -> tuple[bool, str]:
-    response = fetch_with_retry(urljoin(base_url, "/robots.txt"), domains, max_bytes=1024 * 1024)
+@lru_cache(maxsize=512)
+def _robots_rules(origin: str, domains: tuple[str, ...]):
+    response = fetch_with_retry(urljoin(origin, "/robots.txt"), list(domains), max_bytes=1024 * 1024)
     if response.status_code == 429 or response.status_code >= 500:
-        return False, f"HTTP_{response.status_code}"
+        return None, f"HTTP_{response.status_code}", False
     if response.status_code >= 400:
-        return True, f"HTTP_{response.status_code}"
+        return None, f"HTTP_{response.status_code}", True
     parser = RobotFileParser()
     parser.parse(response.body.decode("utf-8", errors="ignore").splitlines())
-    return parser.can_fetch(USER_AGENT, base_url), "CHECKED"
+    return parser, "CHECKED", False
+
+
+def check_robots(url: str, domains: list[str]) -> tuple[bool, str]:
+    parts = urlsplit(url)
+    parser, status, allowed_without_rules = _robots_rules(f"{parts.scheme}://{parts.netloc}", tuple(domains))
+    return (parser.can_fetch(USER_AGENT, url) if parser else allowed_without_rules), status
 
 
 def audit_source(source: dict, store: ObjectStore, include_rss: bool = False) -> dict:
@@ -70,24 +80,73 @@ def audit_source(source: dict, store: ObjectStore, include_rss: bool = False) ->
             "raw_object_uri": store.put(response.body, digest),
             "robots_status": robots_status,
         })
-        if include_rss and source.get("discover_rss"):
+        if include_rss and status == "COLLECTED" and source.get("discover_rss"):
             row["feeds"] = []
-            for feed in discover(row["base_url"], domains):
-                result = collect_rss(feed["rss_url"], domains)
-                feed_digest = sha256(result["body"])
-                row["feeds"].append({
-                    **feed,
-                    "http_status": result["status_code"],
-                    "entries": len(result["entries"]),
-                    "sample": [{"title": item["title"], "url": item["url"]} for item in result["entries"][:3]],
-                    "checkpoint_after": result["checkpoint_after"],
-                    "sha256": feed_digest,
-                    "raw_object_uri": store.put(result["body"], feed_digest),
-                })
+            try:
+                feeds = discover(row["base_url"], domains,
+                                 allowed_url=lambda url: check_robots(url, domains)[0], home_body=response.body)
+            except Exception as exc:
+                row["rss_error"] = f"{type(exc).__name__}: {exc}"
+                feeds = []
+            for feed in feeds:
+                try:
+                    allowed, _ = check_robots(feed["rss_url"], domains)
+                    if not allowed:
+                        row["feeds"].append({**feed, "status": "ROBOTS_BLOCKED"})
+                        continue
+                    result = collect_rss(feed["rss_url"], domains)
+                    feed_digest = sha256(result["body"])
+                    row["feeds"].append({
+                        **feed,
+                        "status": "COLLECTED",
+                        "http_status": result["status_code"],
+                        "entries": len(result["entries"]),
+                        "sample": [{"title": item["title"], "url": item["url"]} for item in result["entries"][:3]],
+                        "checkpoint_after": result["checkpoint_after"],
+                        "sha256": feed_digest,
+                        "raw_object_uri": store.put(result["body"], feed_digest),
+                    })
+                except Exception as exc:
+                    row["feeds"].append({**feed, "status": "FAILED", "error": f"{type(exc).__name__}: {exc}"})
     except Exception as exc:
         row.update({"status": "FAILED", "error_type": type(exc).__name__, "error": str(exc)})
     row["duration_ms"] = round((time.monotonic() - started) * 1000)
     return row
+
+
+def run_audit(sources: list[dict], store: ObjectStore, output: Path, workers: int, include_rss: bool) -> dict:
+    """Write atomic progress snapshots so readers never see partial JSON."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    started_at = datetime.now(timezone.utc).isoformat()
+    rows: list[dict | None] = [None] * len(sources)
+
+    def publish(status: str) -> dict:
+        completed = [row for row in rows if row is not None]
+        summary = {
+            "total": len(sources),
+            "completed": len(completed),
+            "collected": sum(row["status"] == "COLLECTED" for row in completed),
+            "failed": sum(row["status"] == "FAILED" for row in completed),
+            "blocked": sum(row["status"] == "ROBOTS_BLOCKED" for row in completed),
+            "forbidden": sum(row["status"] == "HTTP_FORBIDDEN" for row in completed),
+            "skipped": sum(row["status"].startswith("SKIPPED") or row["status"] == "MISSING_URL" for row in completed),
+            "rss_feeds": sum(sum(feed.get("status") == "COLLECTED" for feed in row.get("feeds", [])) for row in completed),
+            "rss_entries": sum(feed.get("entries", 0) for row in completed for feed in row.get("feeds", [])),
+        }
+        report = {"status": status, "started_at": started_at, "updated_at": datetime.now(timezone.utc).isoformat(),
+                  "summary": summary, "sources": completed}
+        pending = output.with_name(output.name + ".tmp")
+        pending.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        os.replace(pending, output)
+        return report
+
+    report = publish("RUNNING")
+    with ThreadPoolExecutor(max_workers=max(1, min(workers, 16))) as pool:
+        futures = {pool.submit(audit_source, source, store, include_rss): index for index, source in enumerate(sources)}
+        for future in as_completed(futures):
+            rows[futures[future]] = future.result()
+            report = publish("RUNNING")
+    return publish("COMPLETE")
 
 
 def main() -> None:
@@ -103,24 +162,9 @@ def main() -> None:
     sources = yaml.safe_load(Path(args.manifest).read_text(encoding="utf-8")).get("sources", [])
     if args.limit is not None:
         sources = sources[:max(0, args.limit)]
-    store = ObjectStore(args.object_root)
-    with ThreadPoolExecutor(max_workers=max(1, min(args.workers, 16))) as pool:
-        rows = list(pool.map(lambda source: audit_source(source, store, args.rss), sources))
-    summary = {
-        "total": len(rows),
-        "collected": sum(row["status"] == "COLLECTED" for row in rows),
-        "failed": sum(row["status"] == "FAILED" for row in rows),
-        "blocked": sum(row["status"] == "ROBOTS_BLOCKED" for row in rows),
-        "forbidden": sum(row["status"] == "HTTP_FORBIDDEN" for row in rows),
-        "skipped": sum(row["status"].startswith("SKIPPED") or row["status"] == "MISSING_URL" for row in rows),
-        "rss_feeds": sum(len(row.get("feeds", [])) for row in rows),
-        "rss_entries": sum(feed["entries"] for row in rows for feed in row.get("feeds", [])),
-    }
-    report = {"summary": summary, "sources": rows}
     output = Path(args.output)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, indent=2), encoding="utf-8")
-    print(json.dumps(summary, indent=2))
+    report = run_audit(sources, ObjectStore(args.object_root), output, args.workers, args.rss)
+    print(json.dumps(report["summary"], indent=2))
     print(f"Report: {output}")
 
 

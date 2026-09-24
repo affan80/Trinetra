@@ -1,5 +1,4 @@
 .git
-<<<<<<< HEAD
 .gitignore
 __pycache__
 *.pyc
@@ -13,17 +12,11 @@ env
 .vscode
 *.log
 data/
-=======
-.venv
-__pycache__
-*.pyc
-.env
-data/
 artifacts/
 test_output/
 node_modules/
 .next/
 dist/
 build/
-*.log
->>>>>>> dacd510 (build mission and Setup containerized development)
+*.db
+*.jsonl

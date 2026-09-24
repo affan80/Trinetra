@@ -1,4 +1,8 @@
 import uuid
+import json
+import os
+from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import select, update
@@ -12,10 +16,13 @@ from backend.app.services.monitoring_profile_builder import build
 from backend.app.services.query_expander import expand
 from backend.app.services.requirement_parser import parse_watchlist
 
-app = FastAPI(title="TRINETRA Layer 1", version="1.0.0")
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    Base.metadata.create_all(engine)
+    yield
 
-@app.on_event("startup")
-def startup(): Base.metadata.create_all(engine)
+
+app = FastAPI(title="TRINETRA Layer 1", version="1.0.0", lifespan=lifespan)
 
 def current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer), db: Session = Depends(get_db)):
     if not credentials: raise HTTPException(401, "Authentication required")
@@ -24,6 +31,32 @@ def current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer), db
     user = db.get(User, user_id)
     if not user: raise HTTPException(401, "Authentication required")
     return user
+
+
+@app.get(settings.api_v1_prefix + "/overview")
+def overview(db: Session = Depends(get_db), user=Depends(current_user)):
+    from backend.app.services.overview import build_overview
+    return build_overview(db, user)
+
+
+@app.get(settings.api_v1_prefix + "/source-audit")
+def source_audit(user=Depends(current_user)):
+    report = Path(os.getenv("SOURCE_AUDIT_REPORT", "artifacts/source_audit_live.json"))
+    try:
+        return json.loads(report.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {"status": "NOT_STARTED", "started_at": None, "updated_at": None,
+                "summary": {"total": 0, "completed": 0, "collected": 0, "failed": 0, "blocked": 0,
+                            "forbidden": 0, "skipped": 0, "rss_feeds": 0, "rss_entries": 0}, "sources": []}
+
+
+@app.get(settings.api_v1_prefix + "/overview/lineage/{record_id}")
+def overview_lineage(record_id: str, db: Session = Depends(get_db), user=Depends(current_user)):
+    from backend.app.services.overview import build_lineage
+    lineage = build_lineage(db, record_id, user)
+    if lineage is None:
+        raise HTTPException(404, "Evidence record not found")
+    return lineage
 
 def require_roles(*roles):
     def dependency(user=Depends(current_user)):

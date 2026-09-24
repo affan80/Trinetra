@@ -79,6 +79,7 @@ env/
 .env.production.local
 *.env
 *.env.*
+!.env.example
 
 .scrapy/
 

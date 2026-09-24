@@ -24,9 +24,9 @@ class NewsSpider(scrapy.Spider):
     custom_settings = {
         "DEPTH_LIMIT": 5,
         "DOWNLOAD_DELAY": 0.5,
-        "ROBOTSTXT_OBEY": False,
-        "CONCURRENT_REQUESTS": 16,
-        "USER_AGENT": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+        "ROBOTSTXT_OBEY": True,
+        "CONCURRENT_REQUESTS": 2,
+        "USER_AGENT": "TRINETRA-OSINT-Collector/0.1",
     }
 
     article_paths = [
@@ -75,7 +75,7 @@ class NewsSpider(scrapy.Spider):
 
     def start_requests(self):
         for url in self.start_urls:
-            request = self.build_request(url, self.parse)
+            request = self.build_request(url, self.parse_article if self.is_article_url(url) else self.parse)
             if request:
                 yield request
 
