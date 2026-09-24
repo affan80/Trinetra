@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 from services.ingestion.scraper.discovery import UrlCandidate
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 DEFAULT_REGISTRY_PATH = os.getenv(
     "SOURCE_REGISTRY_PATH",
     os.path.join(PROJECT_ROOT, "config", "scraper", "source_registry.json"),

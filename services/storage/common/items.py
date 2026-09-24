@@ -2,6 +2,43 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
+from scrapy import Field as ScrapyField
+from scrapy import Item
+
+
+class NewsItem(Item):
+    """Canonical Scrapy output for news, RSS, and public social records."""
+
+    source_name = ScrapyField()
+    source_type = ScrapyField()
+    url = ScrapyField()
+    title = ScrapyField()
+    text = ScrapyField()
+    author = ScrapyField()
+    published_at = ScrapyField()
+    country_tags = ScrapyField()
+    topic_tags = ScrapyField()
+    metadata = ScrapyField()
+
+
+class BlogItem(NewsItem):
+    """Blog output uses the same stable envelope as news output."""
+
+
+class ImageItem(Item):
+    """Canonical Scrapy output for image observations."""
+
+    source_name = ScrapyField()
+    source_type = ScrapyField()
+    page_url = ScrapyField()
+    image_url = ScrapyField()
+    image_urls = ScrapyField()
+    images = ScrapyField()
+    title = ScrapyField()
+    alt = ScrapyField()
+    caption = ScrapyField()
+    metadata = ScrapyField()
+
 class SourceInfo(BaseModel):
     url: str
     domain: str
@@ -25,8 +62,8 @@ class UnifiedDocument(BaseModel):
     source: SourceInfo
     content: ContentInfo
     metadata: Metadata
-    media: List[Dict[str, Any]] = []
-    entities: List[Dict[str, Any]] = []
-    locations: List[Dict[str, Any]] = []
-    events: List[Dict[str, Any]] = []
-    relationships: List[Dict[str, Any]] = []
+    media: List[Dict[str, Any]] = Field(default_factory=list)
+    entities: List[Dict[str, Any]] = Field(default_factory=list)
+    locations: List[Dict[str, Any]] = Field(default_factory=list)
+    events: List[Dict[str, Any]] = Field(default_factory=list)
+    relationships: List[Dict[str, Any]] = Field(default_factory=list)

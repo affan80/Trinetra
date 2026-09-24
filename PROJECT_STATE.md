@@ -72,3 +72,7 @@ SimHash blocking, MinHash/LSH, conservative similarity decisions, lineage/attrib
 - Full 217-source base audit completed with 167 collected, 34 transport/configuration failures, 12 HTTP-forbidden responses, and 4 robots/policy blocks. Report: `artifacts/source_audit_217_final.json`.
 - Importer now merges www/non-www source variants and emits both explicit approved host variants for redirect validation; transient audit network errors retry three times with bounded backoff.
 - Registry audit artifacts are ignored by Git; canonical source manifest remains the version-controlled seed.
+- Restored the canonical Scrapy `NewsItem`, `BlogItem`, and `ImageItem` contract in `services/storage/common/items.py`; removed legacy NER/Kafka pipelines from default spider startup so collection does not require Layer 6 or Kafka.
+- Fixed optional Parsel fallback extraction and the source registry path; all local tests pass with or without Scrapling installed.
+- Scrapy discovery now loads `blogs`, `frontier`, `images`, `news`, and `telegram`; the default crawler settings disable Telnet, NER, and Kafka startup coupling.
+- Full `.venv` regression suite: 29 passed, 4 deprecation warnings.

@@ -7,7 +7,10 @@ from services.ingestion.scraper.config import get_scrapling_settings
 try:
     from scrapling import Selector
 except Exception:  # pragma: no cover - exercised when dependency is absent
-    Selector = None
+    try:
+        from parsel import Selector
+    except Exception:  # pragma: no cover - exercised in minimal environments
+        Selector = None
 
 
 class ScraplingExtractor:
@@ -28,11 +31,15 @@ class ScraplingExtractor:
             return None
 
         try:
-            return Selector(
-                self.html,
-                url=self.url,
-                adaptive=self.settings.adaptive_enabled,
-            )
+            try:
+                return Selector(
+                    self.html,
+                    url=self.url,
+                    adaptive=self.settings.adaptive_enabled,
+                )
+            except TypeError:
+                # Parsel fallback has the compatible CSS API but no Scrapling options.
+                return Selector(text=self.html, type="html")
         except Exception:
             return None
 

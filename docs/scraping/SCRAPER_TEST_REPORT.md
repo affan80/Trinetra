@@ -6,7 +6,7 @@ New checks:
 
 - `scrapling[fetchers]==0.4.9` installed successfully in the local `.venv`.
 - `python -c "import scrapling; print(scrapling.__version__)"` returned `0.4.9`.
-- `python -m compileall -q services/scraper services/crawlers tests/scraper/test_scrapers.py` passed.
+- `python -m compileall -q services/ingestion/scraper services/ingestion/crawlers tests/scraper/test_scrapers.py` passed.
 - `python tests/smoke/test_imports.py` passed.
 - `python tests/scraper/test_scrapers.py` passed 7 regression tests.
 - `ScraplingFetchClient` static fetch to `https://books.toscrape.com/` returned HTTP 200.
@@ -37,14 +37,14 @@ Validated the scraper/crawler fixes for:
 
 ```bash
 ./.venv/bin/python -m py_compile \
-  services/crawlers/spiders/image_spider.py \
-  services/crawlers/spiders/news_spider.py \
-  services/crawlers/spiders/blog_spider.py \
-  services/scraper/surfaceweb/image_scraper.py \
-  services/parser/pipelines.py \
-  services/shared/redis_client.py \
-  services/shared/redis_queue.py \
-  services/shared/redis_metrics.py
+  services/ingestion/crawlers/spiders/image_spider.py \
+  services/ingestion/crawlers/spiders/news_spider.py \
+  services/ingestion/crawlers/spiders/blog_spider.py \
+  services/ingestion/scraper/surfaceweb/image_scraper.py \
+  services/processing/parser/pipelines.py \
+  services/storage/shared/redis_client.py \
+  services/storage/shared/redis_queue.py \
+  services/storage/shared/redis_metrics.py
 
 ./.venv/bin/python tests/smoke/test_imports.py
 ./.venv/bin/python tests/scraper/test_scrapers.py
@@ -55,21 +55,21 @@ Live spider checks were run with Redis intentionally unavailable:
 
 ```bash
 REDIS_URL=redis://localhost:6399/0 ./.venv/bin/scrapy runspider \
-  services/crawlers/spiders/image_spider.py \
+  services/ingestion/crawlers/spiders/image_spider.py \
   -a urls=https://books.toscrape.com/ \
   -a max_pages=3 \
   -O artifacts/test_output/manual_20260614_scraper_validation/image_redis_off.jsonl \
   --loglevel INFO
 
 REDIS_URL=redis://localhost:6399/0 ./.venv/bin/scrapy runspider \
-  services/crawlers/spiders/blog_spider.py \
+  services/ingestion/crawlers/spiders/blog_spider.py \
   -a urls=https://www.csis.org/blogs/ \
   -a max_pages=3 \
   -O artifacts/test_output/manual_20260614_scraper_validation/blog_redis_off.jsonl \
   --loglevel INFO
 
 REDIS_URL=redis://localhost:6399/0 ./.venv/bin/scrapy runspider \
-  services/crawlers/spiders/news_spider.py \
+  services/ingestion/crawlers/spiders/news_spider.py \
   -a urls=https://www.aljazeera.com/ \
   -a max_pages=20 \
   -O artifacts/test_output/manual_20260614_scraper_validation/news_aljazeera_20_redis_off.jsonl \
@@ -82,7 +82,7 @@ Optional local pipeline output was tested with:
 OSINT_PIPELINE_LOCAL_FILE=1 \
 OSINT_PIPELINE_OUTPUT_DIR=artifacts/test_output/manual_20260614_scraper_validation/pipeline_local \
 REDIS_URL=redis://localhost:6399/0 \
-./.venv/bin/scrapy runspider services/crawlers/spiders/image_spider.py \
+./.venv/bin/scrapy runspider services/ingestion/crawlers/spiders/image_spider.py \
   -a urls=https://books.toscrape.com/ \
   -a max_pages=1 \
   -O artifacts/test_output/manual_20260614_scraper_validation/image_pipeline_local_feed.jsonl \

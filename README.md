@@ -63,7 +63,15 @@ PROJECT_STATE.md            compact implementation state
 docker-compose.yml          local PostgreSQL/Redis/MinIO/API/worker stack
 ~~~
 
-Legacy crawler, processing, graph, Kafka, and model code remains in services/, models/, and related directories for separate work. It is not installed by the active backend Docker image and is not part of the current Layer 1–5 request path.
+The canonical collection code is under `services/ingestion/`: Scrapy spiders, RSS discovery, fetchers, extractors, and source policy. The old top-level `services/crawlers`, `services/scraper`, `services/common`, and `services/shared` aliases were removed. Layer 1–5 API services remain under `backend/`; legacy Kafka/ML processing is not part of the collector command path.
+
+Collection has three deliberate entry points, not duplicate crawlers:
+
+- `services/ingestion/scraper/discovery/connectors/rss.py` discovers candidate URLs.
+- `backend/app/collectors/adapters/rss.py` performs the hardened Layer-3 RSS fetch and evidence preservation.
+- `services/ingestion/crawlers/spiders/*.py` performs bounded Scrapy page crawling for approved URLs.
+
+They have different responsibilities and share the canonical source/item contracts.
 
 ## Docker quick start
 
@@ -264,6 +272,64 @@ npm run dev
 
 The frontend currently provides basic watchlist and collection-control pages, prioritizing functionality over finished visual design.
 
+## Local scraper and RSS collection
+
+Install the optional collection stack from the repository root:
+
+~~~bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export PYTHONPATH=.
+~~~
+
+Run deterministic checks and bounded sample spiders:
+
+~~~bash
+./run_tests.sh
+~~~
+
+Run one canonical spider:
+
+~~~bash
+.venv/bin/scrapy runspider \
+  services/ingestion/crawlers/spiders/news_spider.py \
+  -a urls=https://www.bbc.com/ -a max_pages=10 \
+  -O artifacts/test_output/news.jsonl
+~~~
+
+Run RSS discovery or the source registry audit:
+
+~~~bash
+PYTHONPATH=. .venv/bin/python scripts/discover_rss.py --source SRC-PIB
+PYTHONPATH=. .venv/bin/python scripts/audit_source_registry.py --workers 4 --rss
+~~~
+
+The audit is bounded, respects robots and source policy, validates redirects/SSRF, hashes collected bytes, and records failures. It does not bypass HTTP 403, TLS errors, or robots blocks.
+
+## Docker collection
+
+Start the supported application stack:
+
+~~~bash
+docker compose up --build
+~~~
+
+The Compose API image intentionally installs only `backend/requirements.txt`. Scrapy is an optional collection dependency and is not silently added to the API runtime. To run a spider in Docker, use a temporary collector container with the repository mounted:
+
+~~~bash
+docker run --rm -it \
+  -v "$PWD:/app" -w /app \
+  -e PYTHONPATH=/app \
+  python:3.12-slim bash -lc \
+  "pip install --no-cache-dir -r requirements.txt && \
+   scrapy runspider services/ingestion/crawlers/spiders/news_spider.py \
+   -a urls=https://www.bbc.com/ -a max_pages=10 \
+   -O artifacts/test_output/news-docker.jsonl"
+~~~
+
+Use Docker Compose for PostgreSQL/Redis/MinIO/API and the bounded collector command for Scrapy. Keep robots, domain, URL-budget, and redirect checks enabled.
+
 ## Verification
 
 Run the active Layer 1–5 regression and security tests:
@@ -286,6 +352,8 @@ cd .. && docker compose config
 ~~~
 
 The tests cover watchlist CRUD, RSS fixtures, hashing/storage paths, exact deduplication, idempotent reruns, ownership checks, and security-oriented URL behavior. Docker image startup additionally requires a running Docker daemon.
+
+Collection smoke verification: `PYTHONPATH=. .venv/bin/scrapy list` loads `blogs`, `frontier`, `images`, `news`, and `telegram`. Network crawling still depends on DNS, outbound network access, source robots policy, and the target site being available; use local fixtures for CI.
 
 ## Security boundaries
 

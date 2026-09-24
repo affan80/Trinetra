@@ -60,14 +60,14 @@ If you want to run a specific spider manually, use these commands:
 Finds and extracts images with their titles and descriptions.
 ```bash
 export PYTHONPATH="."
-scrapy runspider services/crawlers/spiders/image_spider.py -a urls=https://example.com -o output.jsonl
+scrapy runspider services/ingestion/crawlers/spiders/image_spider.py -a urls=https://example.com -o output.jsonl
 ```
 
 ### News Spider
 Crawls news sites like BBC or Al Jazeera for articles.
 ```bash
 export PYTHONPATH="."
-scrapy runspider services/crawlers/spiders/news_spider.py -a urls=https://www.bbc.com/ -o output.jsonl
+scrapy runspider services/ingestion/crawlers/spiders/news_spider.py -a urls=https://www.bbc.com/ -o output.jsonl
 ```
 
 ### Discovery Dry Run
@@ -93,7 +93,7 @@ python -m services.ingestion.scraper.discovery.run_discovery \
 Crawls a bounded batch from the Redis URL frontier and sends extracted items through the normal pipeline.
 ```bash
 export PYTHONPATH="."
-scrapy runspider services/crawlers/spiders/frontier_spider.py \
+scrapy runspider services/ingestion/crawlers/spiders/frontier_spider.py \
   -a batch_size=10 \
   -O artifacts/test_output/frontier.jsonl
 ```
@@ -117,17 +117,10 @@ The parser service has been enhanced to include a robust pipeline architecture.
 
 ### Pipeline Order (settings.py)
 1.  **`EnrichmentPipeline` (250)**: Normalizes text and adds collection metadata (`enriched_at`).
-2.  **`EntityExtractionPipeline` (275)**: Extracts entities (PERSON, ORG, LOC/GPE) from `text` using Spacy NLP and adds them to `metadata['entities']`.
-3.  **`OsintPipeline` (300)**: Core processing, validation, local storage, and Redis push.
-4.  **`KafkaPipeline` (400)**: Pushes validated items to Kafka for downstream processing.
-5.  **`DLQPipeline` (500)**: Routes failed items (validation status 'failed') to a dead-letter-ready state.
+2.  **`OsintPipeline` (300)**: Core collection output, validation, local storage, and optional Redis push.
+3.  **`DLQPipeline` (500)**: Routes failed items (validation status 'failed') to a dead-letter-ready state.
 
-### Important: Enabling NER
-The `EntityExtractionPipeline` requires the Spacy `en_core_web_sm` model:
-```bash
-python -m spacy download en_core_web_sm
-```
-*If missing, this pipeline will be automatically disabled, and other pipelines will continue to operate normally.*
+NER and Kafka are intentionally not enabled in the default crawler settings. They belong to later processing layers and are not required to collect raw records.
 
 ---
 
@@ -143,4 +136,4 @@ python -m spacy download en_core_web_sm
 *   **Discovery Limits**: Use `DISCOVERY_MAX_RESULTS`, `DISCOVERY_TIMEOUT_SECONDS`, `DISCOVERY_RATE_LIMIT_SECONDS`, and `FRONTIER_BATCH_SIZE` to keep discovery and frontier crawls bounded.
 *   **API Keys**: `BRAVE_SEARCH_API_KEY` and `YOUTUBE_API_KEY` are optional. Their connectors return structured missing-credential errors when keys are not configured.
 *   **Interruption**: You can stop any crawl by pressing `Ctrl+C`. The data collected up to that point will be saved safely.
-*   **Cleaning Data**: All text cleaning and date parsing logic is central in `services/common/`.
+*   **Cleaning Data**: All text cleaning and date parsing logic is central in `services/storage/common/`.
