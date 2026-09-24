@@ -1,15 +1,17 @@
 import uuid
 import json
 import os
+import re
 from contextlib import asynccontextmanager
 from pathlib import Path
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from backend.app.core.config import settings
 from backend.app.core.security import bearer, create_access_token, decode_access_token, hash_password, verify_password
-from backend.app.db.database import Base, engine, get_db
+from backend.app.db.database import Base, SessionLocal, engine, get_db
+from backend.app.db.seed import seed_database_if_empty
 from backend.app.db.models import *
 from backend.app.schemas import LoginIn, RegisterIn, WatchlistIn, WatchlistPatch
 from backend.app.services.monitoring_profile_builder import build
@@ -19,6 +21,9 @@ from backend.app.services.requirement_parser import parse_watchlist
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     Base.metadata.create_all(engine)
+    if os.getenv("TESTING", "false").lower() != "true":
+        with SessionLocal() as db:
+            seed_database_if_empty(db)
     yield
 
 
@@ -41,6 +46,11 @@ def overview(db: Session = Depends(get_db), user=Depends(current_user)):
 
 @app.get(settings.api_v1_prefix + "/source-audit")
 def source_audit(user=Depends(current_user)):
+    report = _source_audit_report()
+    return {key: report.get(key) for key in ("status", "started_at", "updated_at", "summary")}
+
+
+def _source_audit_report():
     report = Path(os.getenv("SOURCE_AUDIT_REPORT", "artifacts/source_audit_live.json"))
     try:
         return json.loads(report.read_text(encoding="utf-8"))
@@ -50,6 +60,84 @@ def source_audit(user=Depends(current_user)):
                             "forbidden": 0, "skipped": 0, "rss_feeds": 0, "rss_entries": 0}, "sources": []}
 
 
+@app.get(settings.api_v1_prefix + "/source-audit/outputs")
+def source_audit_outputs(
+    page: int = Query(1, ge=1), size: int = Query(50, ge=1, le=100), q: str = "",
+    type: str = "", source: str = "", status: str = "", user=Depends(current_user),
+):
+    outputs = []
+    for row in _source_audit_report().get("sources", []):
+        outputs.append({
+            "id": f"source:{row.get('id')}", "type": "SOURCE_ATTEMPT", "source_id": row.get("id"),
+            "source": row.get("name") or "Unknown source", "title": row.get("name") or row.get("base_url") or "Source attempt",
+            "url": row.get("final_url") or row.get("base_url"), "status": row.get("status") or "UNKNOWN",
+            "http_status": row.get("http_status"), "error": row.get("error"),
+            "base_url": row.get("base_url"), "final_url": row.get("final_url"),
+            "content_type": row.get("content_type"), "content_length": row.get("content_length"),
+            "sha256": row.get("sha256"), "robots_status": row.get("robots_status"),
+            "duration_ms": row.get("duration_ms"), "error_type": row.get("error_type"),
+            "rss_error": row.get("rss_error"), "feed_count": len(row.get("feeds", [])),
+        })
+        for feed_index, feed in enumerate(row.get("feeds", [])):
+            for entry_index, entry in enumerate(feed.get("items", feed.get("sample", []))):
+                outputs.append({
+                    "id": f"rss:{row.get('id')}:{feed_index}:{entry_index}", "type": "RSS_ENTRY", "source_id": row.get("id"),
+                    "source": row.get("name") or "Unknown source", "title": entry.get("title") or "Untitled RSS entry",
+                    "url": entry.get("url"), "status": feed.get("status") or "UNKNOWN",
+                    "http_status": feed.get("http_status"), "error": feed.get("error"),
+                    "published": entry.get("published"), "feed_url": feed.get("rss_url"),
+                    "updated": entry.get("updated"), "author": entry.get("author"),
+                    "summary": entry.get("summary"), "tags": entry.get("tags") or [],
+                    "entry_id": entry.get("entry_id"), "rss_type": feed.get("rss_type"),
+                    "discovery_method": feed.get("discovery_method"),
+                })
+    needle = q.casefold().strip()
+    outputs = [item for item in outputs if
+               (not type or item["type"] == type.upper()) and
+               (not source or source.casefold() in f"{item['source_id']} {item['source']}".casefold()) and
+               (not status or item["status"] == status.upper()) and
+               (not needle or needle in f"{item['title']} {item['source']} {item.get('url') or ''}".casefold())]
+    start = (page - 1) * size
+    return {"items": outputs[start:start + size], "total": len(outputs), "page": page, "size": size}
+
+
+# Headline place mentions are approximate leads, never verified incident coordinates.
+CITY_COORDS = {
+    "New Delhi": (28.6139, 77.2090), "Delhi": (28.6139, 77.2090),
+    "Mumbai": (19.0760, 72.8777), "Bengaluru": (12.9716, 77.5946),
+    "Kolkata": (22.5726, 88.3639), "Chennai": (13.0827, 80.2707),
+    "Hyderabad": (17.3850, 78.4867), "Pune": (18.5204, 73.8567),
+    "Ahmedabad": (23.0225, 72.5714), "Jaipur": (26.9124, 75.7873),
+    "Lucknow": (26.8467, 80.9462), "Patna": (25.5941, 85.1376),
+    "Bhopal": (23.2599, 77.4126), "Chandigarh": (30.7333, 76.7794),
+    "Srinagar": (34.0837, 74.7973), "Jammu": (32.7266, 74.8570),
+    "Imphal": (24.8170, 93.9368), "Guwahati": (26.1445, 91.7362),
+    "Kyiv": (50.4501, 30.5234), "Warsaw": (52.2297, 21.0122),
+    "Gaza": (31.5017, 34.4668), "Cardiff": (51.4816, -3.1791),
+    "Tehran": (35.6892, 51.3890), "Kabul": (34.5553, 69.2075),
+}
+
+
+@app.get(settings.api_v1_prefix + "/source-audit/map")
+def source_audit_map(user=Depends(current_user)):
+    from backend.app.services.overview import _public_url
+    items = []
+    total = 0
+    for row in _source_audit_report().get("sources", []):
+        for feed in row.get("feeds", []):
+            for entry in feed.get("items", feed.get("sample", [])):
+                total += 1
+                title = entry.get("title") or ""
+                for city, (latitude, longitude) in CITY_COORDS.items():
+                    if re.search(rf"(?<!\w){re.escape(city)}(?!\w)", title, re.IGNORECASE):
+                        items.append({"id": f"{row.get('id')}:{total}:{city}", "title": title,
+                                      "source": row.get("name"), "city": city,
+                                      "latitude": latitude, "longitude": longitude,
+                                      "published": entry.get("published"), "url": _public_url(entry.get("url"))})
+                        break
+    return {"items": items, "total_entries": total, "unmapped_entries": total - len(items)}
+
+
 @app.get(settings.api_v1_prefix + "/overview/lineage/{record_id}")
 def overview_lineage(record_id: str, db: Session = Depends(get_db), user=Depends(current_user)):
     from backend.app.services.overview import build_lineage
@@ -57,6 +145,15 @@ def overview_lineage(record_id: str, db: Session = Depends(get_db), user=Depends
     if lineage is None:
         raise HTTPException(404, "Evidence record not found")
     return lineage
+
+
+@app.get(settings.api_v1_prefix + "/incidents/{wid}")
+def incident(wid: uuid.UUID, location: uuid.UUID | None = None, db: Session = Depends(get_db), user=Depends(current_user)):
+    from backend.app.services.overview import build_incident
+    watchlist = find_watchlist(wid, db, user)
+    if location and not any(link.location_id == location for link in watchlist.locations):
+        raise HTTPException(404, "Location not found in watchlist")
+    return build_incident(db, watchlist, location)
 
 def require_roles(*roles):
     def dependency(user=Depends(current_user)):

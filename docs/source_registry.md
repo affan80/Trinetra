@@ -5,10 +5,14 @@ This seed document is intentionally version-controlled and importer-owned. Add a
 ## NEWS
 
 - [Al Jazeera](https://www.aljazeera.com/)
+- [NDTV](https://www.ndtv.com/)
+- [The Indian Express](https://indianexpress.com/)
+- [Scroll.in](https://scroll.in/)
 
 ## BLOG_ANALYSIS
 
 - [CSIS](https://www.csis.org/)
+- [Alt News](https://www.altnews.in/)
 
 ## TEST
 

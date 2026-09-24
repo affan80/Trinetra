@@ -1,13 +1,17 @@
 """Read-only analyst overview assembled from the existing evidence tables."""
 
+import os
 from datetime import datetime, timedelta, timezone
+from urllib.parse import urlsplit
 
 from sqlalchemy import distinct, func, select
 from sqlalchemy.orm import Session
 
+from backend.app.db.seed import seed_user_watchlist
 from backend.app.db.models import (
     AuditLog,
     CanonicalRecord,
+    CollectionProvenance,
     CollectionJob,
     CollectionPlan,
     CollectorWorker,
@@ -25,12 +29,21 @@ from backend.app.db.models import (
 )
 
 
+def _public_url(value: str | None) -> str | None:
+    if not value:
+        return None
+    parsed = urlsplit(value)
+    return value if parsed.scheme in {"http", "https"} and parsed.netloc else None
+
+
 def _count(db: Session, model, *conditions) -> int:
     return db.scalar(select(func.count()).select_from(model).where(*conditions)) or 0
 
 
 def _visible_watchlists(db: Session, user) -> list[Watchlist]:
-    query = select(Watchlist).where(Watchlist.status != WatchlistStatus.ARCHIVED).order_by(Watchlist.updated_at.desc()).limit(50)
+    if os.getenv("TRINETRA_AUTO_SEED", "true").lower() == "true":
+        seed_user_watchlist(db, user)
+    query = select(Watchlist).where(Watchlist.status != WatchlistStatus.ARCHIVED).order_by(Watchlist.updated_at.desc())
     if user.role.value != "ADMIN":
         query = query.where(Watchlist.created_by == user.id)
     return list(db.scalars(query))
@@ -107,18 +120,19 @@ def build_overview(db: Session, user) -> dict:
         .order_by(CanonicalRecord.created_at.desc())
         .limit(40)
     ).all()
-    records = [{
-        "id": record.record_id,
-        "evidence_id": record.evidence_id,
-        "title": record.title or record.canonical_url or "Untitled evidence",
-        "type": record.record_type,
-        "source": source_name or "Unknown source",
-        "watchlist_id": str(record.watchlist_id) if record.watchlist_id else None,
-        "timestamp": (record.published_at or record.retrieved_at or record.created_at).isoformat(),
-        "quality_score": quality_score,
-        "quality_status": quality_status.value if quality_status else None,
-        "url": record.canonical_url,
-    } for record, source_name, quality_score, quality_status in rows]
+    records = []
+    for record, source_name, quality_score, quality_status in rows:
+        raw = db.scalar(select(RawObject).where(RawObject.evidence_id == record.evidence_id))
+        demo = bool(raw and raw.object_uri.startswith("test://"))
+        records.append({
+            "id": record.record_id, "evidence_id": record.evidence_id,
+            "title": record.title or record.canonical_url or "Untitled evidence",
+            "type": record.record_type, "source": source_name or "Unknown source",
+            "watchlist_id": str(record.watchlist_id) if record.watchlist_id else None,
+            "timestamp": (record.published_at or record.retrieved_at or record.created_at).isoformat(),
+            "quality_score": quality_score, "quality_status": quality_status.value if quality_status else None,
+            "demo": demo, "url": None if demo else _public_url(record.canonical_url),
+        })
 
     sources = list(db.scalars(select(Source).order_by(Source.name).limit(100)))
     source_count = _count(db, Source)
@@ -208,4 +222,83 @@ def build_lineage(db: Session, record_id: str, user) -> dict | None:
         "raw": {"id": raw.evidence_id, "retrieved_at": raw.retrieved_at.isoformat()} if raw else None,
         "related": [{"id": row_id, "title": title or "Untitled evidence", "source": name or "Unknown source"} for row_id, title, name in related],
         "watchlist": {"id": str(watchlist.id), "name": watchlist.name} if watchlist else None,
+    }
+
+
+def build_incident(db: Session, watchlist: Watchlist, selected_location_id=None) -> dict:
+    locations = [db.get(Location, link.location_id) for link in watchlist.locations]
+    rows = db.execute(
+        select(CanonicalRecord, Source.name, RecordQuality.quality_score, RecordQuality.status)
+        .outerjoin(Source, Source.id == CanonicalRecord.source_id)
+        .outerjoin(RecordQuality, RecordQuality.record_id == CanonicalRecord.record_id)
+        .where(CanonicalRecord.watchlist_id == watchlist.id)
+        .order_by(CanonicalRecord.created_at.desc())
+    ).all()
+    records = []
+    for record, source_name, quality_score, quality_status in rows:
+        raw = db.scalar(select(RawObject).where(RawObject.evidence_id == record.evidence_id))
+        demo = bool(raw and raw.object_uri.startswith("test://"))
+        provenance = db.scalar(select(CollectionProvenance).where(CollectionProvenance.raw_object_id == raw.id)) if raw else None
+        clusters = list(db.scalars(select(DuplicateClusterMember).where(DuplicateClusterMember.record_id == record.record_id)))
+        records.append({
+            "id": record.record_id,
+            "evidence_id": record.evidence_id,
+            "title": record.title or record.canonical_url or "Untitled evidence",
+            "type": record.record_type,
+            "source": source_name or "Unknown source",
+            "source_id": str(record.source_id) if record.source_id else None,
+            "watchlist_id": str(watchlist.id),
+            "url": None if demo else _public_url(record.canonical_url),
+            "demo": demo,
+            "timestamp": (record.published_at or record.retrieved_at or record.created_at).isoformat(),
+            "published_at": record.published_at.isoformat() if record.published_at else None,
+            "retrieved_at": record.retrieved_at.isoformat() if record.retrieved_at else None,
+            "created_at": record.created_at.isoformat(),
+            "language": record.primary_language,
+            "plain_text": record.plain_text,
+            "content_blocks": record.content_blocks,
+            "processing_quality": record.processing_quality,
+            "quality_score": quality_score,
+            "quality_status": quality_status.value if quality_status else None,
+            "raw": ({
+                "id": raw.evidence_id, "url": None if demo else _public_url(raw.final_url), "retrieved_at": raw.retrieved_at.isoformat(),
+                "source_url": None if demo else _public_url(raw.source_url), "http_status": raw.http_status,
+                "content_type": raw.content_type, "content_length": raw.content_length,
+                "sha256": raw.sha256, "adapter_type": raw.adapter_type,
+                "provenance": ({"collector_id": provenance.collector_id, "collector_version": provenance.collector_version,
+                                "collection_method": provenance.collection_method, "requested_url": _public_url(provenance.requested_url),
+                                "final_url": _public_url(provenance.final_url), "redirect_chain": provenance.redirect_chain,
+                                "observed_at": provenance.observed_at.isoformat()} if provenance else None),
+            } if raw else None),
+            "clusters": [{"id": str(item.cluster_id), "relationship": item.relationship_type, "score": item.similarity_score} for item in clusters],
+        })
+
+    audits = list(db.scalars(
+        select(AuditLog).where(AuditLog.watchlist_id == watchlist.id).order_by(AuditLog.timestamp.desc()).limit(50)
+    ))
+    timeline = [
+        {"id": f"record:{record['id']}", "timestamp": record["timestamp"], "title": "Evidence normalized", "detail": record["title"], "kind": "evidence"}
+        for record in records
+    ] + [
+        {"id": f"raw:{record['raw']['id']}", "timestamp": record["raw"]["retrieved_at"], "title": "Raw evidence collected", "detail": record["title"], "kind": "raw"}
+        for record in records if record["raw"]
+    ] + [
+        {"id": f"audit:{event.id}", "timestamp": event.timestamp.isoformat(), "title": event.event_type.replace("_", " ").title(), "detail": "Watchlist activity", "kind": "audit"}
+        for event in audits
+    ]
+    timeline.sort(key=lambda item: item["timestamp"], reverse=True)
+    return {
+        "watchlist": {
+            "id": str(watchlist.id), "title": watchlist.name, "objective": watchlist.objective,
+            "status": watchlist.status.value, "priority": watchlist.priority.value,
+            "created_at": watchlist.created_at.isoformat(), "updated_at": watchlist.updated_at.isoformat(),
+        },
+        "locations": [{
+            "id": str(location.id), "name": location.name, "country": location.country,
+            "region": location.region, "city": location.city,
+            "latitude": location.latitude, "longitude": location.longitude,
+        } for location in locations if location],
+        "selected_location_id": str(selected_location_id) if selected_location_id else None,
+        "records": records,
+        "timeline": timeline,
     }

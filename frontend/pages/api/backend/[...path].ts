@@ -8,11 +8,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ detail: "Method not allowed" });
   }
   const route = path.join("/");
-  if (!/^(overview(?:\/lineage\/[^/]+)?|source-audit|auth\/(?:login|register)|watchlists|collection-jobs)$/.test(route)) {
+  if (!/^(overview(?:\/lineage\/[^/]+)?|incidents\/[^/]+|source-audit(?:\/(?:outputs|map))?|auth\/(?:login|register)|watchlists|collection-jobs)$/.test(route)) {
     return res.status(404).json({ detail: "Route not found" });
   }
   try {
-    const response = await fetch(`${base}/api/v1/${path.map(encodeURIComponent).join("/")}`, {
+    const query = new URLSearchParams(Object.entries(req.query).filter(([key]) => key !== "path").flatMap(([key, value]) => Array.isArray(value) ? value.map(item => [key, item]) : value === undefined ? [] : [[key, value]])).toString();
+    const response = await fetch(`${base}/api/v1/${path.map(encodeURIComponent).join("/")}${query ? `?${query}` : ""}`, {
       method: req.method,
       headers: {
         ...(typeof req.headers.authorization === "string" ? { Authorization: req.headers.authorization } : {}),

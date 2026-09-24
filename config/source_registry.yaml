@@ -18,6 +18,63 @@ sources:
   discover_rss: true
   robots_policy: CHECK
   auth_type: NONE
+- id: SRC-NDTV-COM
+  name: NDTV
+  sector:
+  - NEWS
+  source_class: NEWS
+  base_url: https://www.ndtv.com/
+  allowed_domains:
+  - ndtv.com
+  - www.ndtv.com
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-INDIANEXPRESS-COM
+  name: The Indian Express
+  sector:
+  - NEWS
+  source_class: NEWS
+  base_url: https://indianexpress.com/
+  allowed_domains:
+  - indianexpress.com
+  - www.indianexpress.com
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-SCROLL-IN
+  name: Scroll.in
+  sector:
+  - NEWS
+  source_class: NEWS
+  base_url: https://scroll.in/
+  allowed_domains:
+  - scroll.in
+  - www.scroll.in
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
 - id: SRC-CSIS-ORG
   name: CSIS
   sector:
@@ -27,6 +84,25 @@ sources:
   allowed_domains:
   - csis.org
   - www.csis.org
+  enabled: true
+  preferred_adapter: RSS
+  fallback_adapter: WEB
+  language:
+  - en
+  country: []
+  priority: MEDIUM
+  discover_rss: true
+  robots_policy: CHECK
+  auth_type: NONE
+- id: SRC-ALTNEWS-IN
+  name: Alt News
+  sector:
+  - BLOG_ANALYSIS
+  source_class: BLOG
+  base_url: https://www.altnews.in/
+  allowed_domains:
+  - altnews.in
+  - www.altnews.in
   enabled: true
   preferred_adapter: RSS
   fallback_adapter: WEB

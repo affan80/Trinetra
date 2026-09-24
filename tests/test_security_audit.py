@@ -1,4 +1,6 @@
+import os
 import uuid
+os.environ["TESTING"] = "true"
 from fastapi.testclient import TestClient
 from backend.app.main import app
 

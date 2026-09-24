@@ -8,13 +8,14 @@ import { PipelineHealth } from "@/components/pipeline/PipelineHealth";
 import { AppShell } from "@/components/shell/AppShell";
 import { OperationalTimeline } from "@/components/timeline/OperationalTimeline";
 import { OperationalMetrics } from "@/components/overview/OperationalMetrics";
-import { getLineage, getOverview, getSourceAudit, tokenKey } from "@/lib/api";
-import type { Lineage, Overview, SourceAudit } from "@/types/overview";
+import { getLineage, getOverview, getSourceAudit, getSourceOutputs, tokenKey } from "@/lib/api";
+import type { Lineage, Overview, RawCollectionOutput, SourceAudit } from "@/types/overview";
 
 export function OverviewWorkspace() {
   const [token, setToken] = useState<string | null>(null);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [audit, setAudit] = useState<SourceAudit | null>(null);
+  const [rawOutputs, setRawOutputs] = useState<RawCollectionOutput[]>([]);
   const [lineage, setLineage] = useState<Lineage | null>(null);
   const [lineageError, setLineageError] = useState(false);
   const [selectedWatchlistId, setSelectedWatchlistId] = useState<string | null>(null);
@@ -60,12 +61,16 @@ export function OverviewWorkspace() {
   useEffect(() => {
     if (!token) return;
     let active = true;
-    const update = () => getSourceAudit(token).then(data => {
-      if (active) setAudit(data);
-    }).catch(() => { if (active) setAudit(null); });
-    update();
-    const interval = window.setInterval(update, 3_000);
-    return () => { active = false; window.clearInterval(interval); };
+    let timer = 0;
+    const update = () => Promise.all([getSourceAudit(token), getSourceOutputs(token, "type=RSS_ENTRY&size=100"), getSourceOutputs(token, "type=SOURCE_ATTEMPT&size=100")]).then(([data, entries, attempts]) => {
+      const seenSources = new Set<string>();
+      const seenStatuses = new Set<string>();
+      const acrossSources = entries.items.filter(item => !seenSources.has(item.source_id) && !!seenSources.add(item.source_id));
+      const acrossStatuses = attempts.items.filter(item => !seenStatuses.has(item.status) && !!seenStatuses.add(item.status));
+      if (active) { setAudit(data); setRawOutputs([...acrossSources, ...acrossStatuses]); timer = window.setTimeout(update, data.status === "RUNNING" ? 3_000 : 15_000); }
+    }).catch(() => { if (active) { setAudit(null); setRawOutputs([]); timer = window.setTimeout(update, 15_000); } });
+    void update();
+    return () => { active = false; window.clearTimeout(timer); };
   }, [token]);
   useEffect(() => {
     if (!token || !selectedRecordId) return;
@@ -110,11 +115,11 @@ export function OverviewWorkspace() {
       </div>
       <OperationalMetrics metrics={overview?.metrics ?? null} />
       <div className="primary-grid">
-        <OperationalMap watchlists={overview?.watchlists ?? []} selectedId={selectedWatchlistId} onSelect={setSelectedWatchlistId} />
+        <OperationalMap watchlists={overview?.watchlists ?? []} selectedId={selectedWatchlistId} />
         <ActiveInvestigationPanel watchlist={selectedWatchlist} records={overview?.records ?? []} />
       </div>
       <div className="lower-grid">
-        <RecentEvidenceTable records={visibleRecords} selectedId={selectedRecordId} onSelect={setSelectedRecordId} />
+        <RecentEvidenceTable records={visibleRecords} rawOutputs={rawOutputs} selectedId={selectedRecordId} onSelect={setSelectedRecordId} />
         <SourceLineageGraph lineage={lineage?.record.id === selectedRecordId ? lineage : null} selectedRecord={selectedRecord} error={lineageError} />
         <OperationalTimeline entries={overview?.timeline ?? []} generatedAt={overview?.generated_at ?? null} />
         <PipelineHealth pipeline={overview?.pipeline ?? null} sources={overview?.sources ?? []} audit={audit} />

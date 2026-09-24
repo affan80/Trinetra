@@ -20,9 +20,9 @@ export const navigation: { group: string; items: { label: string; icon: LucideIc
     { label: "Deduplication", icon: Copy },
     { label: "Source Lineage", icon: Link2 },
     { label: "Entities", icon: Users },
-    { label: "Events", icon: CalendarClock },
-    { label: "Graph", icon: Network },
-    { label: "Timeline", icon: CalendarClock },
+    { label: "Events", icon: CalendarClock, href: "/graph#timeline" },
+    { label: "Graph", icon: Network, href: "/graph" },
+    { label: "Timeline", icon: CalendarClock, href: "/graph#timeline" },
     { label: "Watchlists", icon: ShieldCheck, href: "/watchlists" },
     { label: "System Pipeline", icon: Activity },
   ] },
@@ -39,4 +39,4 @@ export const navigation: { group: string; items: { label: string; icon: LucideIc
   ] },
 ];
 
-export const mapLayers = ["Grid", "Watchlist locations"] as const;
+export const mapLayers = ["Interactive tiles", "Watchlist locations", "Coordinate grid"] as const;

@@ -101,7 +101,7 @@ def audit_source(source: dict, store: ObjectStore, include_rss: bool = False) ->
                         "status": "COLLECTED",
                         "http_status": result["status_code"],
                         "entries": len(result["entries"]),
-                        "sample": [{"title": item["title"], "url": item["url"]} for item in result["entries"][:3]],
+                        "items": result["entries"],
                         "checkpoint_after": result["checkpoint_after"],
                         "sha256": feed_digest,
                         "raw_object_uri": store.put(result["body"], feed_digest),
@@ -126,7 +126,9 @@ def run_audit(sources: list[dict], store: ObjectStore, output: Path, workers: in
             "total": len(sources),
             "completed": len(completed),
             "collected": sum(row["status"] == "COLLECTED" for row in completed),
-            "failed": sum(row["status"] == "FAILED" for row in completed),
+            "failed": sum(row["status"] not in {"COLLECTED", "ROBOTS_BLOCKED", "HTTP_FORBIDDEN"}
+                          and not row["status"].startswith("SKIPPED") and row["status"] != "MISSING_URL"
+                          for row in completed),
             "blocked": sum(row["status"] == "ROBOTS_BLOCKED" for row in completed),
             "forbidden": sum(row["status"] == "HTTP_FORBIDDEN" for row in completed),
             "skipped": sum(row["status"].startswith("SKIPPED") or row["status"] == "MISSING_URL" for row in completed),

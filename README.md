@@ -14,6 +14,12 @@ Layer 4  Canonical-record input seam
 Layer 5  Data quality, exact deduplication, clustering, representative selection
 ~~~
 
+## Screenshots
+
+| Overview & Workspace | Operations & Map |
+|---|---|
+| ![Dashboard 1](Screenshot%202026-09-24%20at%2021.08.58.png) | ![Dashboard 2](Screenshot%202026-09-24%20at%2021.09.27.png) |
+
 The active repository preserves source observations and adds deterministic operational metadata. Intelligence analysis is intentionally outside the current Layer 1–5 path: no NER, event extraction, credibility scoring, knowledge graph, RAG, or LLM analysis.
 
 ## Current status
@@ -262,28 +268,93 @@ The current supplied registry contains 218 parsed links, merged into 217 unique 
 
 Tests use local RSS and autodiscovery fixtures. Check robots and usage policies before broad discovery against third-party sites.
 
-## Local development
+## Running Trinetra (Local vs Docker)
 
-Backend:
+Trinetra can be run in two modes: **Locally** (ideal for active development and instant hot-reloading of code changes) or **via Docker** (ideal for production-like containerized deployment).
 
-~~~bash
-python -m venv .venv
+---
+
+### Method 1: Running Locally (Recommended for Development)
+
+Running locally without Docker allows instant hot-reloading of both backend and frontend changes.
+
+#### Prerequisites
+- Python 3.10+
+- Node.js 18+ & npm
+- PostgreSQL (optional; defaults to local SQLite if `DATABASE_URL` is unset)
+
+#### Step 1: Configure Environment Variables
+```bash
+cp .env.example .env
+```
+*(Ensure `DATABASE_URL` is configured if using PostgreSQL, or leave unset for SQLite).*
+
+#### Step 2: Set up Python Virtual Environment & Install Backend Dependencies
+```bash
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r backend/requirements.txt
-PYTHONPATH=. uvicorn backend.app.main:app --reload --port 8000
-~~~
+pip install -r requirements.txt
+```
 
-For PostgreSQL-backed development, export DATABASE_URL and the other values from .env. Leave DATABASE_URL unset for the default SQLite test seam.
+#### Step 3: Start the Backend API Server
+```bash
+export PYTHONPATH=.
+uvicorn backend.app.main:app --reload --port 8000
+```
+*(The backend automatically seeds demo watchlists, sources, jobs, raw evidence, and map locations on startup if the database is empty).*
+- Backend API: `http://localhost:8000`
+- API Docs: `http://localhost:8000/docs`
 
-Frontend:
-
-~~~bash
+#### Step 4: Start the Frontend Development Server
+Open a new terminal window/tab:
+```bash
 cd frontend
 npm ci
+# If connecting to a custom backend API URL:
+export API_INTERNAL_URL=http://127.0.0.1:8000
 npm run dev
-~~~
+```
+- Frontend Dashboard: `http://localhost:3000`
+- **Hot-Reloading:** Any changes made to React components (`frontend/components/`), pages (`frontend/pages/`), or styles will reflect instantly in your browser on save.
 
-For a local frontend with a separately running API, set `API_INTERNAL_URL=http://127.0.0.1:8000` before `npm run dev`.
+---
+
+### Method 2: Running on Docker
+
+Running via Docker Compose spins up PostgreSQL, Redis, Celery workers, Scheduler, Backend API, and Frontend in containerized services.
+
+#### Prerequisites
+- Docker Desktop or Docker Engine with Compose support.
+
+#### Step 1: Configure Environment Variables
+```bash
+cp .env.example .env
+```
+
+#### Step 2: Build and Start the Stack
+```bash
+docker compose up --build
+```
+
+#### Services & Ports
+| Service | Address | Purpose |
+|---|---|---|
+| frontend | http://localhost:3000 | Next.js UI |
+| backend | http://localhost:8000 | FastAPI API |
+| postgres | localhost:5432 | System of record |
+| redis | localhost:6379 | Queue/cache handoff |
+
+#### Important Note on Frontend Changes in Docker
+The default production Dockerfile for the frontend builds a static production bundle (`npm run build` and `next start`). Because the container does not mount your host's `frontend/` directory as a live volume, **code changes made on your host machine will not automatically appear in the browser** when running via `docker compose up`.
+
+To see frontend changes when using Docker, you have two choices:
+1. **Rebuild the container:**
+   ```bash
+   docker compose up --build frontend
+   ```
+2. **Switch to Local Dev Mode (Recommended for development):**
+   Stop the frontend container (`docker compose stop frontend`), then run the frontend locally via `cd frontend && npm run dev`.
 
 ## Local scraper and RSS collection
 

@@ -1,6 +1,7 @@
 import os
 import uuid
 os.environ["DATABASE_URL"] = "sqlite:////tmp/trinetra-layer1-test.db"
+os.environ["TESTING"] = "true"
 from fastapi.testclient import TestClient
 from backend.app.main import app
 
